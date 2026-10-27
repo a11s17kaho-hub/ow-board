@@ -241,7 +241,10 @@ td .who { display: block; white-space: nowrap; }
 .dside .herobtn { flex: none; width: 100%; }
 .dside .herobtn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dknown { gap: 4px; }
-#dform.mystery .dside .herobtn { display: none; }
+#dform.nohero .dside .herobtn { display: none; }
+.score input { font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1; width: 2.2em; text-align: center; border: none; background: none; color: var(--fg); padding: 0; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.score input::-webkit-outer-spin-button, .score input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dside.lead .score input { color: var(--win); }
 .dknown button { font-size: 12px; padding: 1px 8px; }
 .dknown button[aria-pressed="true"] { border-style: solid; border-color: var(--accent); color: var(--fg); font-weight: 700; }
 .vs { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--muted); align-self: center; }
@@ -249,6 +252,7 @@ td .who { display: block; white-space: nowrap; }
 .score button { font: inherit; font-size: 18px; width: 36px; height: 36px; border: 1px solid var(--line); background: var(--chip); color: var(--fg); border-radius: 8px; cursor: pointer; flex: none; }
 .score b { font-family: var(--font-display); font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
 .dside.lead .score b { color: var(--win); }
+.mapbtn.fixed { cursor: default; }
 .mapbtn .mnm.solo { padding: 10px 8px; }
 table.dm { min-width: 0; width: auto; }
 .dm th, .dm td { text-align: center; padding: 6px 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -518,10 +522,10 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   <div class="grid" id="duelView" hidden>
     <section class="panel" aria-labelledby="h-dadd">
       <h2 id="h-dadd">1v1を記録</h2>
-      <p class="hint">カスタムゲームでの1対1の勝負を記録します。スコアは取ったラウンド数(例: 3対1)です。</p>
+      <p class="hint">カスタムゲームの1v1を記録します。</p>
       <form id="dform" autocomplete="off">
-        <div class="field"><span class="label">ルール</span>
-          <div class="seg2" id="dRuleSeg"><button type="button" data-v="mystery">ミステリー(ランダム)</button><button type="button" data-v="limited">リミテッド(3体から)</button><button type="button" data-v="free">自由に選ぶ</button></div>
+        <div class="field"><span class="label">ルール:ワークショップ「1v1 Arena」</span>
+          <div class="seg2" id="dRuleSeg" hidden><button type="button" data-v="arena">1v1 Arena(TXCXX)</button><button type="button" data-v="mystery">ミステリー(ランダム)</button><button type="button" data-v="limited">リミテッド(3体から)</button><button type="button" data-v="free">自由に選ぶ</button></div>
           <p class="hint" id="dRuleHint"></p>
         </div>
         <div class="duelers">
@@ -530,7 +534,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
             <input type="text" id="d0Name" list="nameList" maxlength="24" placeholder="名前" class="nt">
             <div class="known dknown" id="d0Known"></div>
             <button type="button" class="herobtn" id="d0Hero"></button>
-            <div class="score"><button type="button" data-sc="0" data-d="-1" aria-label="プレイヤー1のスコアを減らす">−</button><b id="d0Score">0</b><button type="button" data-sc="0" data-d="1" aria-label="プレイヤー1のスコアを増やす">＋</button></div>
+            <div class="score"><button type="button" data-sc="0" data-d="-1" aria-label="プレイヤー1のスコアを減らす">−</button><input type="number" id="d0Score" min="0" max="99" inputmode="numeric" value="0" aria-label="プレイヤー1のスコア"><button type="button" data-sc="0" data-d="1" aria-label="プレイヤー1のスコアを増やす">＋</button></div>
           </div>
           <div class="vs">VS</div>
           <div class="dside" id="dSide1">
@@ -538,10 +542,10 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
             <input type="text" id="d1Name" list="nameList" maxlength="24" placeholder="名前" class="nt">
             <div class="known dknown" id="d1Known"></div>
             <button type="button" class="herobtn" id="d1Hero"></button>
-            <div class="score"><button type="button" data-sc="1" data-d="-1" aria-label="プレイヤー2のスコアを減らす">−</button><b id="d1Score">0</b><button type="button" data-sc="1" data-d="1" aria-label="プレイヤー2のスコアを増やす">＋</button></div>
+            <div class="score"><button type="button" data-sc="1" data-d="-1" aria-label="プレイヤー2のスコアを減らす">−</button><input type="number" id="d1Score" min="0" max="99" inputmode="numeric" value="0" aria-label="プレイヤー2のスコア"><button type="button" data-sc="1" data-d="1" aria-label="プレイヤー2のスコアを増やす">＋</button></div>
           </div>
         </div>
-        <div class="field"><span class="label">マップ(任意)</span><button type="button" class="mapbtn" id="dMapBtn"></button></div>
+        <div class="field"><span class="label">マップ</span><div class="mapbtn fixed" id="dMapBtn"></div></div>
         <label class="field"><span class="label">日付</span><input type="date" id="dDate"></label>
         <label class="field"><span class="label">メモ(任意)</span><input type="text" id="dNote" maxlength="80" placeholder="例: ゲンジミラー、先取3"></label>
         <button class="primary" id="dSubmit" type="submit" disabled>記録する</button>
@@ -553,7 +557,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     <div class="col">
       <section class="panel" aria-labelledby="h-dlb">
         <div class="phead"><h2 id="h-dlb">1v1ランキング</h2>
-          <div class="tools"><label class="f dtools"><span class="label">ルール</span><select id="dRuleF"><option value="">すべて</option><option value="mystery">ミステリー</option><option value="limited">リミテッド</option><option value="free">自由に選ぶ</option></select></label><label class="f dtools"><span class="label">期間</span><select id="dRange"><option value="all">全期間</option><option value="7">直近7日</option><option value="30">直近30日</option><option value="90">直近90日</option></select></label></div>
+          <div class="tools"><label class="f dtools" hidden><span class="label">ルール</span><select id="dRuleF"><option value="">すべて</option><option value="arena">1v1 Arena</option><option value="mystery">ミステリー</option><option value="limited">リミテッド</option><option value="free">自由に選ぶ</option></select></label><label class="f dtools"><span class="label">期間</span><select id="dRange"><option value="all">全期間</option><option value="7">直近7日</option><option value="30">直近30日</option><option value="90">直近90日</option></select></label></div>
         </div>
         <div class="lb" id="dLb"></div>
         <p class="hint">勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。ラウンド差は、取ったラウンドから取られたラウンドを引いた数です。</p>
@@ -572,7 +576,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
         <div id="dRival" class="groups"></div>
       </section>
 
-      <section class="panel" aria-labelledby="h-dhero">
+      <section class="panel" aria-labelledby="h-dhero" hidden>
         <h2 id="h-dhero">1v1のヒーロー別成績</h2>
         <div class="cards" id="dHeroes"></div>
       </section>
@@ -628,7 +632,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   const MAP_TYPE = {};
   MAPS.forEach(([t, ms]) => ms.forEach(m => MAP_TYPE[m] = t));
   // カスタムゲームの1v1で選べるマップ(エリミネーション/デスマッチ用のアリーナと、ワークショップ用の空間)
+  const ARENA_MAP = "Lijiang Tower: Control Center";
   const DUEL_MAPS = [
+    ["ワークショップ「1v1 Arena」", [ARENA_MAP]],
     ["ミステリー・リミテッドデュエル", ["Castillo", "Ecopoint: Antarctica", "Necropolis"]],
     ["エリミネーション", ["Black Forest"]],
     ["デスマッチ", ["Château Guillard", "Kanezaka", "Malevento", "Petra"]],
@@ -638,7 +644,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   const DUEL_MAP_TYPE = {};
   DUEL_MAPS.forEach(([t, ms]) => ms.forEach(m => DUEL_MAP_TYPE[m] = t));
   // アリーナには専用の絵がないので、雰囲気の近いマップの絵を借りる
-  const MAP_ART_ALIAS = { "Black Forest": "Eichenwalde", "Castillo": "Dorado", "Ecopoint: Antarctica": "Antarctic Peninsula", "Necropolis": "Throne of Anubis", "Château Guillard": "King's Row", "Kanezaka": "Hanaoka", "Malevento": "Rialto", "Petra": "Aatlis" };
+  const MAP_ART_ALIAS = { "Lijiang Tower: Control Center": "Lijiang Tower", "Black Forest": "Eichenwalde", "Castillo": "Dorado", "Ecopoint: Antarctica": "Antarctic Peninsula", "Necropolis": "Throne of Anubis", "Château Guillard": "King's Row", "Kanezaka": "Hanaoka", "Malevento": "Rialto", "Petra": "Aatlis" };
   const MODE_ICON = {
     "コントロール": '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
     "エスコート": '<rect x="3" y="8" width="13" height="8" rx="1.5"/><path d="M16 11h3l2 3v2h-5"/><circle cx="7" cy="18" r="1.6" fill="currentColor"/><circle cx="17" cy="18" r="1.6" fill="currentColor"/>',
@@ -647,6 +653,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     "フラッシュポイント": '<path d="M13 3L5 13h6l-1 8 8-10h-6z"/>',
     "クラッシュ": '<path d="M4 4l16 16"/><path d="M20 4L4 20"/><path d="M4 9V4h5"/><path d="M20 15v5h-5"/>',
     "その他": '<circle cx="12" cy="12" r="3" fill="currentColor"/>',
+    "ワークショップ「1v1 Arena」": '<path d="M14 6l4 4-8 8H6v-4z"/><path d="M13 7l4 4"/>',
     "ミステリー・リミテッドデュエル": '<path d="M9 9a3 3 0 1 1 4 2.8c-.8.4-1 1-1 1.7V15"/><circle cx="12" cy="18.5" r=".6" fill="currentColor"/><circle cx="12" cy="12" r="10"/>',
     "エリミネーション": '<circle cx="12" cy="12" r="8"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
     "デスマッチ": '<path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>',
@@ -1501,8 +1508,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   // ---- 1v1(カスタムゲームの1対1)
   let mode = "team", duels = [], dcol = null, dIsSample = true, dShown = 15, dPendingDel = null;
   const dform = { p: [{ name: "", hero: "" }, { name: "", hero: "" }], s: [0, 0], map: "", rule: "mystery" };
-  const RULES = { mystery: "ミステリー", limited: "リミテッド", free: "自由に選ぶ" };
+  const RULES = { arena: "1v1 Arena", mystery: "ミステリー", limited: "リミテッド", free: "自由に選ぶ" };
   const RULE_HINT = {
+    arena: "ワークショップ「1v1 Arena」(コード TXCXX):マップは Lijiang Tower のコントロールセンター。倒されるたびにヒーローがランダムで変わり、先に50ポイント(約17キル)取ったほうの勝ち。スコアにはポイントかキル数を入れてください。",
     mystery: "1v1 ミステリーデュエル:毎ラウンド、2人とも同じヒーローがランダムで決まります。先に5本取ったほうの勝ち。ヒーローは選ばなくてOKです。",
     limited: "1v1 リミテッドデュエル:毎ラウンド、同じ3体の中から選びます。先に5本取ったほうの勝ち。よく使ったヒーローを選んでおくと、ヒーロー別の成績に残ります(任意)。",
     free: "好きなヒーローどうしで勝負します。使ったヒーローを選んでおくと、ヒーロー別やライバル対決の組み合わせに残ります。",
@@ -1515,9 +1523,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     for (let i = 0; i < 26; i++) {
       const a = Math.floor(r() * 4); let b = Math.floor(r() * 3); if (b >= a) b++;
       const pa = skill[a] / (skill[a] + skill[b]); let s1 = 0, s2 = 0;
-      while (s1 < 3 && s2 < 3) { if (r() < pa) s1++; else s2++; }
+      while (s1 < 17 && s2 < 17) { if (r() < pa) s1++; else s2++; }
       const d = new Date(); d.setDate(d.getDate() - Math.floor((26 - i) * .9));
-      out.push({ id: "ds" + i, rule: ["mystery", "mystery", "limited", "free"][Math.floor(r() * 4)], p1: { name: names[a], hero: hs[Math.floor(r() * hs.length)] }, p2: { name: names[b], hero: hs[Math.floor(r() * hs.length)] }, s1, s2, map: maps[Math.floor(r() * maps.length)], date: isoDay(d), note: "", createdAt: i });
+      out.push({ id: "ds" + i, rule: "arena", p1: { name: names[a], hero: "" }, p2: { name: names[b], hero: "" }, s1, s2, map: ARENA_MAP, date: isoDay(d), note: "", createdAt: i });
     }
     return out;
   }
@@ -1560,25 +1568,26 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
 
   // フォーム
   function setDRule(r) {
-    dform.rule = RULES[r] ? r : "mystery"; lsSet("ow-duel-rule", dform.rule);
+    dform.rule = RULES[r] ? r : "arena"; lsSet("ow-duel-rule", dform.rule);
+    if (dform.rule === "arena") setDMap(ARENA_MAP);
     setPressed($("dRuleSeg"), dform.rule);
     $("dRuleHint").textContent = RULE_HINT[dform.rule];
-    $("dform").classList.toggle("mystery", dform.rule === "mystery");
+    $("dform").classList.toggle("nohero", dform.rule === "mystery" || dform.rule === "arena");
   }
   $("dRuleSeg").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) setDRule(b.dataset.v); });
-  setDRule(lsGet("ow-duel-rule") || "mystery");
+  setDRule("arena");
   function renderDForm() {
     [0, 1].forEach(i => {
       const p = dform.p[i];
       $(`d${i}Hero`).innerHTML = p.hero ? `${heroEmblem(p.hero, HERO_ROLE[p.hero])}<span>${esc(p.hero)}</span>` : `<span class="ph">ヒーローを選ぶ</span>`;
-      $(`d${i}Score`).textContent = dform.s[i];
+      if (document.activeElement !== $(`d${i}Score`)) $(`d${i}Score`).value = dform.s[i];
       $(`dSide${i}`).classList.toggle("lead", dform.s[i] > dform.s[1 - i]);
     });
     updateDSubmit();
   }
   function setDMap(m) {
     dform.map = m;
-    $("dMapBtn").innerHTML = m ? `<span class="art">${mapArt(m)}</span><span class="mnm">${esc(m)}<small>変更</small></span>` : `<span class="mnm solo">マップなし<small>選ぶ</small></span>`;
+    $("dMapBtn").innerHTML = m ? `<span class="art">${mapArt(m)}</span><span class="mnm">${esc(m)}</span>` : `<span class="mnm solo">マップなし<small>選ぶ</small></span>`;
     lsSet("ow-duel-map", m);
   }
   // よく出てくる名前をボタンで並べ、押すとその側に入る(反対側と同じなら入れ替え)
@@ -1623,17 +1632,23 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     const b = e.target.closest("[data-sc]"); if (!b) return;
     const i = +b.dataset.sc; dform.s[i] = Math.max(0, Math.min(99, dform.s[i] + +b.dataset.d)); renderDForm();
   });
-  $("dMapBtn").addEventListener("click", () => openPicker({ kind: "dmap" }));
+  // 1v1 は 1v1 Arena(マップ固定)だけにしたので、マップは選ばない
+  [0, 1].forEach(i => {
+    const el = $(`d${i}Score`);
+    el.addEventListener("input", () => { const v = parseInt(el.value, 10); dform.s[i] = Number.isFinite(v) ? Math.max(0, Math.min(99, v)) : 0; renderDForm(); });
+    el.addEventListener("blur", () => { el.value = dform.s[i]; });
+    el.addEventListener("focus", () => el.select());
+  });
   $("dDate").value = today();
   try { const last = JSON.parse(lsGet("ow-duel-last") || "null"); if (Array.isArray(last)) last.slice(0, 2).forEach((p, i) => { if (p && typeof p.name === "string") { dform.p[i] = { name: p.name, hero: HERO_ROLE[p.hero] ? p.hero : "" }; $(`d${i}Name`).value = p.name; } }); } catch (e) {}
-  { const lm = lsGet("ow-duel-map"); setDMap(DUEL_MAP_TYPE[lm] ? lm : ""); }
+  setDMap(ARENA_MAP);
   renderDForm();
   $("dform").addEventListener("submit", async e => {
     e.preventDefault();
     const a = dform.p[0].name.trim().slice(0, 24), b = dform.p[1].name.trim().slice(0, 24);
     if (!dcol || !a || !b) return;
     if (a === b) { $("dToast").textContent = "同じ名前どうしは記録できません"; return; }
-    const myst = dform.rule === "mystery";
+    const myst = dform.rule === "mystery" || dform.rule === "arena";
     const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: dform.s[0], s2: dform.s[1], map: dform.map, date: $("dDate").value || today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now() };
     $("dSubmit").disabled = true;
     try {
@@ -1715,7 +1730,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
       </div>
       ${wlBar(t)}
       <div class="group"><h3>最近の勝負<span class="cnt">左の人から見た結果</span></h3><div class="strip">${recent.map(x => { const r = dRes(x); return `<i class="${r}" title="${esc(x.d.date)} ${x.my}-${x.os}">${r === "win" ? "W" : r === "loss" ? "L" : "D"}</i>`; }).join("")}</div></div>
-      <div class="group"><h3>ヒーロー別の対戦</h3><div class="mups">${mus.map(m => `<div class="mup">${hv(m.ha)}<span class="label">vs</span>${hv(m.hb)}<span class="rec">${m.t.win}-${m.t.loss}${m.t.draw ? "-" + m.t.draw : ""}</span></div>`).join("")}</div></div>`;
+      ${mus.some(m => m.ha || m.hb) ? "" : "<!--"}<div class="group"><h3>ヒーロー別の対戦</h3><div class="mups">${mus.map(m => `<div class="mup">${hv(m.ha)}<span class="label">vs</span>${hv(m.hb)}<span class="rec">${m.t.win}-${m.t.loss}${m.t.draw ? "-" + m.t.draw : ""}</span></div>`).join("")}</div></div>${mus.some(m => m.ha || m.hb) ? "" : "-->"}`;
   }
   ["dA", "dB"].forEach(id => $(id).addEventListener("change", () => { lsSet("ow-" + id, $(id).value); renderDuels(); }));
   $("dRange").addEventListener("change", () => { lsSet("ow-dRange", $("dRange").value); renderDuels(); });
@@ -1939,6 +1954,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["1v1 ミステリーデュエル:毎ラウンド、2人とも同じヒーローがランダムで決まります。先に5本取ったほうの勝ち。ヒーローは選ばなくてOKです。", "1v1 Mystery Duel: each round both players get the same random hero. First to 5 wins. No need to pick heroes.", "1v1 미스터리 결투: 매 라운드 두 사람 모두 같은 영웅이 무작위로 정해집니다. 먼저 5승 하면 승리. 영웅은 고르지 않아도 됩니다."],
     ["1v1 リミテッドデュエル:毎ラウンド、同じ3体の中から選びます。先に5本取ったほうの勝ち。よく使ったヒーローを選んでおくと、ヒーロー別の成績に残ります(任意)。", "1v1 Limited Duel: each round both pick from the same 3 heroes. First to 5 wins. Pick the hero you used most to track it (optional).", "1v1 제한 결투: 매 라운드 같은 3명 중에서 고릅니다. 먼저 5승 하면 승리. 가장 많이 쓴 영웅을 고르면 영웅별 성적에 남습니다(선택)."],
     ["好きなヒーローどうしで勝負します。使ったヒーローを選んでおくと、ヒーロー別やライバル対決の組み合わせに残ります。", "Any heroes you like. Pick the heroes used to track hero stats and matchups.", "원하는 영웅끼리 승부합니다. 사용한 영웅을 고르면 영웅별 성적과 대결 조합에 남습니다."],
+    ["ワークショップ「1v1 Arena」", "Workshop \"1v1 Arena\"", "워크샵 \"1v1 Arena\""],
+    ["プレイヤー1のスコア", "Player 1 score", "플레이어 1 점수"], ["プレイヤー2のスコア", "Player 2 score", "플레이어 2 점수"],
+    ["ワークショップ「1v1 Arena」(コード TXCXX):マップは Lijiang Tower のコントロールセンター。倒されるたびにヒーローがランダムで変わり、先に50ポイント(約17キル)取ったほうの勝ち。スコアにはポイントかキル数を入れてください。", "Workshop \"1v1 Arena\" (code TXCXX): played on Lijiang Tower's Control Center. Your hero changes randomly each time you die; first to 50 points (about 17 kills) wins. Enter points or kills as the score.", "워크샵 \"1v1 Arena\"(코드 TXCXX): 리장 타워 관제 센터에서 진행합니다. 죽을 때마다 영웅이 무작위로 바뀌고, 먼저 50포인트(약 17킬)를 얻으면 승리. 점수에는 포인트나 킬 수를 입력하세요."],
     // 1v1
     ["表示の切り替え", "Switch view", "보기 전환"],
     ["チーム戦", "Team", "팀전"],
