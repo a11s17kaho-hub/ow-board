@@ -450,6 +450,41 @@ h2::before { content: ""; flex: none; width: 6px; height: 1.05em; background: li
 .mapcard .art img, .mapcard .art svg { transition: transform .3s ease; }
 .mapcard:hover .art svg { transform: scale(1.04); }
 th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
+/* ページタブ */
+.pagetabs {
+  grid-column: 1 / -1; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 5px; box-shadow: var(--shadow);
+}
+.pagetabs::-webkit-scrollbar { display: none; }
+.pagetabs button {
+  font: inherit; font-weight: 700; font-size: 14px; white-space: nowrap; flex: none;
+  border: none; background: transparent; color: var(--muted); border-radius: 8px; padding: 8px 16px; cursor: pointer;
+}
+.pagetabs button:hover { color: var(--fg); background: var(--chip); }
+.pagetabs button[aria-pressed="true"] { background: var(--band); color: var(--band-fg); box-shadow: inset 0 -3px 0 var(--accent); }
+@media (min-width: 901px) { .pagetabs .only-narrow { display: none; } }
+/* フレンドの使用ヒーロー */
+.col > section[aria-label="絞り込み"] { order: -2; }
+.col > section[aria-labelledby="h-fhero"] { order: -1; }
+.fhlist { display: flex; flex-direction: column; gap: 6px; }
+.fhrow {
+  font: inherit; color: var(--fg); text-align: left; cursor: pointer; display: grid; grid-template-columns: minmax(6em, 10em) minmax(0, 1fr); gap: 8px 12px; align-items: center;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 8px 10px; min-width: 0;
+}
+.fhrow[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.fhrow .fn { display: flex; flex-direction: column; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+.fhrow .fn small { font-weight: 400; color: var(--muted); font-size: 11px; }
+.fhrow .fh { display: flex; flex-wrap: wrap; gap: 6px; }
+.fhh { position: relative; width: 38px; height: 38px; display: block; }
+.fhh svg { width: 100%; height: 100%; display: block; }
+.fhh b { position: absolute; right: -4px; bottom: -4px; font-size: 10px; line-height: 1; padding: 2px 4px; border-radius: 6px; background: var(--band); color: var(--band-fg); font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .fhrow { grid-template-columns: minmax(0, 1fr); } }
+.fhd { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.fhrecent { display: flex; flex-direction: column; gap: 4px; }
+.fhm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; padding: 4px 8px; border-radius: 8px; background: var(--surface-2); }
+.fhm .fhav { width: 26px; height: 26px; display: block; } .fhm .fhav svg { width: 100%; height: 100%; display: block; }
+.fhm .r { color: var(--muted); font-size: 12px; margin-left: auto; }
 @media (prefers-reduced-motion: reduce) { .tb-art img, .primary, .mapcard .art svg { transition: none; } }
 </style>
 </head>
@@ -489,6 +524,15 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   </div>
 
   <div class="grid" id="teamView">
+    <nav class="pagetabs" id="teamPages" aria-label="ページ">
+      <button type="button" data-v="add" class="only-narrow">記録する</button>
+      <button type="button" data-v="sum">まとめ</button>
+      <button type="button" data-v="trend">推移</button>
+      <button type="button" data-v="friends">フレンド</button>
+      <button type="button" data-v="heroes">ヒーロー</button>
+      <button type="button" data-v="maps">マップ</button>
+      <button type="button" data-v="history">履歴</button>
+    </nav>
     <section class="panel" aria-labelledby="h-add">
       <h2 id="h-add">試合を記録</h2>
       <form id="form" autocomplete="off" class="ranked">
@@ -517,6 +561,11 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
           </div>
           <div class="known" id="known"></div>
           <p class="hint">ランク戦では、試合後に出る「+25%」「−20%」などを入れると、そのメンバーの現在ランクが自動で上下します。</p>
+        </div>
+        <div class="field">
+          <span class="label">味方のヒーロー(フレンド以外)</span>
+          <div class="enemies" id="allies"></div>
+          <button type="button" class="ghost pickbtn" id="allyPick">＋ 味方のヒーローを選ぶ</button>
         </div>
         <div class="field">
           <span class="label">相手チームのヒーロー</span>
@@ -588,6 +637,13 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         <div class="two" id="when"></div>
       </section>
 
+      <section class="panel" aria-labelledby="h-fhero">
+        <h2 id="h-fhero">フレンドの使用ヒーロー</h2>
+        <p class="hint">記録した試合で、フレンドがどのヒーローを使ったかです。名前を押すと、その人のヒーロー別の勝率と最近の試合が出ます。</p>
+        <div class="fhlist" id="fhList"></div>
+        <div id="fhDetail"></div>
+      </section>
+
       <section class="panel" aria-labelledby="h-mem">
         <div class="phead"><h2 id="h-mem">メンバーと現在ランク</h2></div>
         <div class="mcards" id="mcards"></div>
@@ -640,7 +696,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       <section class="panel" aria-labelledby="h-list">
         <h2 id="h-list">試合の記録</h2>
         <div class="tablewrap"><table>
-          <thead><tr><th>日付</th><th>結果</th><th>マップ</th><th>モード</th><th>メンバー(ヒーロー・ランク変動)</th><th>相手</th><th>メモ</th><th></th></tr></thead>
+          <thead><tr><th>日付</th><th>結果</th><th>マップ</th><th>モード</th><th>メンバー(ヒーロー・ランク変動)</th><th>味方</th><th>相手</th><th>メモ</th><th></th></tr></thead>
           <tbody id="rows"></tbody>
         </table></div>
         <button class="ghost more" id="more" hidden>もっと見る</button>
@@ -648,6 +704,12 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     </div>
   </div>
   <div class="grid" id="duelView" hidden>
+    <nav class="pagetabs" id="duelPages" aria-label="ページ">
+      <button type="button" data-v="add" class="only-narrow">記録する</button>
+      <button type="button" data-v="rank">ランキング</button>
+      <button type="button" data-v="rival">ライバル</button>
+      <button type="button" data-v="history">履歴</button>
+    </nav>
     <section class="panel" aria-labelledby="h-dadd">
       <h2 id="h-dadd">1v1を記録</h2>
       <p class="hint">カスタムゲームの1v1を記録します。</p>
@@ -976,7 +1038,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
           const delta = queue !== "ランク" || result === "draw" ? null : (result === "win" ? 1 : -1) * (15 + Math.floor(rnd() * 15));
           return { name: p.name, hero, role: HERO_ROLE[hero], delta };
         });
-        out.push({ id: "s" + d + "-" + i, result, map: maps[Math.floor(rnd() * maps.length)], queue, date: isoDay(day), members, enemies: Array.from({ length: 5 }, (_, j) => { const pool = HEROES[j === 0 ? "tank" : j < 3 ? "damage" : "support"]; return pool[Math.floor(rnd() * 8)]; }), note: "", createdAt: day.getTime() - day.getHours() * 3600000 + (14 + i * 2 + Math.floor(rnd() * 3)) * 3600000 });
+        out.push({ id: "s" + d + "-" + i, result, map: maps[Math.floor(rnd() * maps.length)], queue, date: isoDay(day), members, allies: Array.from({ length: 5 - k }, (_, j) => { const pool = HEROES[["tank", "damage", "support"][j % 3]]; return pool[Math.floor(rnd() * 10)]; }), enemies: Array.from({ length: 5 }, (_, j) => { const pool = HEROES[j === 0 ? "tank" : j < 3 ? "damage" : "support"]; return pool[Math.floor(rnd() * 8)]; }), note: "", createdAt: day.getTime() - day.getHours() * 3600000 + (14 + i * 2 + Math.floor(rnd() * 3)) * 3600000 });
       }
     }
     return out;
@@ -993,7 +1055,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   let db = null, col = null, pcol = null, canWrite = true;
   let matches = [], players = {};
   let isSample = true, shown = 15, editing = null, pendingDel = null;
-  const form = { result: null, queue: "ランク", members: [], enemies: [] };
+  const form = { result: null, queue: "ランク", members: [], enemies: [], allies: [] };
 
   // ---- フォーム
   $("heroList").innerHTML = ROLES.map(([r]) => HEROES[r].map(h => `<option value="${esc(h)}">${ROLE_JA[r]}</option>`).join("")).join("");
@@ -1032,6 +1094,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     renderMembers();
   }
   function renderMembers() {
+    renderAllyChips();
     $("members").innerHTML = form.members.length ? form.members.map((m, i) => `
       <div class="mem" data-i="${i}">
         <div class="memtop"><span class="name">${esc(m.name)}</span><button type="button" class="x" data-rm="${i}" aria-label="${esc(m.name)}を外す">×</button></div>
@@ -1108,13 +1171,22 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   $("enemies").addEventListener("click", e => { const b = e.target.closest("[data-ei]"); if (b) { form.enemies.splice(+b.dataset.ei, 1); renderEnemyChips(); } });
   $("enemyPick").addEventListener("click", () => openPicker({ kind: "enemy" }));
   renderEnemyChips();
+  // 味方(フレンド以外の野良)は 5人 - 登録メンバー数 まで
+  function allyMax() { return Math.max(0, 5 - form.members.length); }
+  function renderAllyChips() {
+    if (form.allies.length > allyMax()) form.allies.length = allyMax();
+    $("allies").innerHTML = form.allies.length ? form.allies.map((h, i) => `<span class="echip">${heroEmblem(h, HERO_ROLE[h])}${esc(h)}<button type="button" data-ai="${i}" aria-label="${esc(h)}を外す">×</button></span>`).join("") : `<span class="empty">まだ選ばれていません(最大${allyMax()}体)</span>`;
+  }
+  $("allies").addEventListener("click", e => { const b = e.target.closest("[data-ai]"); if (b) { form.allies.splice(+b.dataset.ai, 1); renderAllyChips(); } });
+  $("allyPick").addEventListener("click", () => openPicker({ kind: "ally" }));
+  renderAllyChips();
 
   // ---- 選択画面(ヒーロー・マップ)
   let pk = null, pkTab = "all";
   function openPicker(opts) {
     pk = opts; pkTab = "all";
-    $("pkTitle").textContent = opts.kind === "map" || opts.kind === "dmap" ? "マップを選ぶ" : opts.kind === "duel" ? `${dform.p[opts.i].name || "プレイヤー" + (opts.i + 1)}のヒーローを選ぶ` : opts.kind === "enemy" ? "相手チームのヒーローを選ぶ(最大6体)" : `${form.members[opts.i].name}のヒーローを選ぶ`;
-    $("pkDone").textContent = opts.kind === "enemy" ? "決定" : "閉じる";
+    $("pkTitle").textContent = opts.kind === "map" || opts.kind === "dmap" ? "マップを選ぶ" : opts.kind === "duel" ? `${dform.p[opts.i].name || "プレイヤー" + (opts.i + 1)}のヒーローを選ぶ` : opts.kind === "enemy" ? "相手チームのヒーローを選ぶ(最大6体)" : opts.kind === "ally" ? "味方のヒーローを選ぶ" : `${form.members[opts.i].name}のヒーローを選ぶ`;
+    $("pkDone").textContent = opts.kind === "enemy" || opts.kind === "ally" ? "決定" : "閉じる";
     $("picker").hidden = false; document.body.style.overflow = "hidden";
     renderPicker();
     $("pkDone").focus();
@@ -1131,8 +1203,9 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         <div class="mtiles">${ms.map(m => `<button type="button" class="mtile" data-map="${esc(m)}" aria-pressed="${m === cur}"><span class="art">${mapArt(m)}</span><span class="n">${esc(m)}</span></button>`).join("")}</div></div>`).join("");
       return;
     }
-    const chosen = pk.kind === "enemy" ? new Set(form.enemies) : pk.kind === "duel" ? new Set([dform.p[pk.i].hero]) : new Set([form.members[pk.i]?.hero]);
+    const chosen = pk.kind === "enemy" ? new Set(form.enemies) : pk.kind === "ally" ? new Set(form.allies) : pk.kind === "duel" ? new Set([dform.p[pk.i].hero]) : new Set([form.members[pk.i]?.hero]);
     if (pk.kind === "enemy") $("pkTitle").textContent = `相手チームのヒーローを選ぶ(${form.enemies.length}/6)`;
+    if (pk.kind === "ally") $("pkTitle").textContent = `味方のヒーローを選ぶ(${form.allies.length}/${allyMax()})`;
     $("pkBody").innerHTML = ROLES.filter(([k]) => pkTab === "all" || k === pkTab).map(([k, ja]) => `<div class="group"><h3><span class="rolebadge ${k}">${ja}</span></h3>
       <div class="tiles">${HEROES[k].map(h => `<button type="button" class="tile" data-hero="${esc(h)}" aria-pressed="${chosen.has(h)}">${heroEmblem(h, k)}<span>${esc(h)}</span></button>`).join("")}</div></div>`).join("");
   }
@@ -1151,6 +1224,10 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       const j = form.enemies.indexOf(h);
       if (j >= 0) form.enemies.splice(j, 1); else if (form.enemies.length < 6) form.enemies.push(h);
       renderEnemyChips(); renderPicker();
+    } else if (pk.kind === "ally") {
+      const j = form.allies.indexOf(h);
+      if (j >= 0) form.allies.splice(j, 1); else if (form.allies.length < allyMax()) form.allies.push(h);
+      renderAllyChips(); renderPicker();
     } else {
       const m = form.members[pk.i];
       if (m) { m.hero = m.hero === h ? "" : h; if (m.hero) m.role = HERO_ROLE[h]; }
@@ -1179,6 +1256,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         return { name: m.name, hero: (m.hero || "").slice(0, 24), role: m.role || HERO_ROLE[m.hero] || "", delta: ranked && amt > 0 ? m.dir * Math.min(amt, 100) : null };
       }),
       enemies: form.enemies.slice(0, 6),
+      allies: form.allies.slice(0, allyMax()),
       note: $("note").value.trim().slice(0, 80), createdAt: Date.now(),
     };
     $("submit").disabled = true;
@@ -1190,7 +1268,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       lsSet("ow-last-queue", form.queue);
       $("toast").textContent = `記録しました: ${doc.map} で${RES_LABEL[doc.result]}` + (notes.length ? `。${notes.join("、")}なりました` : "");
       form.result = null; setPressed($("resultSeg"), null); $("note").value = "";
-      form.members.forEach(m => m.amt = ""); form.enemies = []; renderMembers(); renderEnemyChips();
+      form.members.forEach(m => m.amt = ""); form.enemies = []; form.allies = []; renderMembers(); renderEnemyChips(); renderAllyChips();
     } catch (err) {
       if (err && err.code === "invalid_argument") { canWrite = false; setStatus(); $("toast").textContent = "このページへの書き込み権限がありません。持ち主に編集者として招待してもらってください。"; }
       else $("toast").textContent = "保存できませんでした。通信を確認してもう一度押してください。";
@@ -1242,6 +1320,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     renderSynergy(list);
     renderWhen(list);
     renderMemberCards(list);
+    renderFriendHeroes(list);
     renderRankChart(list);
     renderTrend(list);
     renderDuels();
@@ -1394,6 +1473,33 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     $("when").innerHTML = `<div class="field"><span class="label">曜日</span>${bars(order.map(i => DAYS[i] + "曜"), order.map(i => byDay[i]))}</div>
       <div class="field"><span class="label">時間帯(朝5-12時・昼12-18時・夜18-23時・深夜23-5時)</span>${bars(SLOTS.map(x => x[0]), bySlot)}</div>${note}`;
   }
+
+  let fhSel = lsGet("ow-fh") || "";
+  function renderFriendHeroes(list) {
+    const sel = $("fMember").value;
+    const rows = knownNames().filter(n => !sel || n === sel).map(name => {
+      const es = entriesOf(list, name), by = new Map();
+      es.forEach(({ m, x }) => { if (!x.hero) return; if (!by.has(x.hero)) by.set(x.hero, []); by.get(x.hero).push(m); });
+      return { name, es, heroes: [...by.entries()].map(([h, ms]) => ({ h, t: tally(ms), last: ms[ms.length - 1].date })).sort((a, b) => b.t.n - a.t.n || (b.t.rate ?? -1) - (a.t.rate ?? -1)) };
+    }).filter(r => r.es.length).sort((a, b) => b.es.length - a.es.length);
+    if (!rows.length) { $("fhList").innerHTML = `<div class="empty">試合を記録すると、フレンドごとの使用ヒーローがここに並びます。</div>`; $("fhDetail").innerHTML = ""; return; }
+    if (!rows.some(r => r.name === fhSel)) fhSel = rows[0].name;
+    $("fhList").innerHTML = rows.map(r => `<button type="button" class="fhrow" data-fh="${esc(r.name)}" aria-pressed="${r.name === fhSel}">
+      <span class="fn"><span class="nt">${esc(r.name)}</span><small>${r.es.length}試合</small></span>
+      <span class="fh">${r.heroes.slice(0, 6).map(x => `<span class="fhh" title="${esc(x.h)}">${heroEmblem(x.h, HERO_ROLE[x.h])}<b>${x.t.n}</b></span>`).join("") || `<span class="label">ヒーロー未記録</span>`}</span>
+    </button>`).join("");
+    const r = rows.find(x => x.name === fhSel);
+    const recent = r.es.slice(-10).reverse();
+    $("fhDetail").innerHTML = `<div class="fhd">
+      <h3><span class="nt">${esc(r.name)}</span>のヒーロー別<span class="cnt">${wlText(tally(r.es.map(e => e.m)))}</span></h3>
+      <div class="cards">${r.heroes.map(({ h, t, last }) => `<div class="card"><span class="av">${heroEmblem(h, HERO_ROLE[h])}</span>
+        <span class="t"><span class="n">${esc(h)}</span><span class="p">${pct(t.rate)}</span></span>
+        <span class="b">${wlBar(t)}<span class="r">${wlText(t)}・最後 ${esc(last.slice(5))}</span></span></div>`).join("") || `<div class="empty">ヒーローが記録されていません</div>`}</div>
+      <h3>最近の試合</h3>
+      <div class="fhrecent">${recent.map(({ m, x }) => `<div class="fhm"><span class="pill ${esc(m.result)}">${RES_LABEL[m.result] || "?"}</span>${x.hero ? `<span class="fhav">${heroEmblem(x.hero, HERO_ROLE[x.hero])}</span><b>${esc(x.hero)}</b>` : `<span class="label">ヒーローなし</span>`}<span class="r">${esc(m.date.slice(5))}・${esc(m.map)}・${esc(m.queue)}</span></div>`).join("")}</div>
+    </div>`;
+  }
+  $("fhList").addEventListener("click", e => { const b = e.target.closest("[data-fh]"); if (!b) return; fhSel = b.dataset.fh; lsSet("ow-fh", fhSel); render(); });
 
   function renderMemberCards(list) {
     const sel = $("fMember").value;
@@ -1605,10 +1711,11 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         <td>${esc(m.map)}</td>
         <td>${esc(m.queue)}</td>
         <td>${(m.members || []).map(x => `<span class="who"><span class="nt">${esc(x.name)}</span>${x.hero ? ` <span class="label">${esc(x.hero)}</span>` : x.role ? ` <span class="label">${ROLE_JA[x.role] || ""}</span>` : ""}${x.delta ? ` <b class="${x.delta > 0 ? "up" : "down"}">${x.delta > 0 ? "▲" : "▼"}${Math.abs(x.delta)}%</b>` : ""}</span>`).join("")}</td>
+        <td><span class="mini">${(m.allies || []).map(h => `<span title="${esc(h)}">${heroEmblem(h, HERO_ROLE[h])}</span>`).join("")}</span></td>
         <td><span class="mini">${(m.enemies || []).map(h => `<span title="${esc(h)}">${heroEmblem(h, HERO_ROLE[h])}</span>`).join("")}</span></td>
         <td>${esc(m.note)}</td>
         <td>${isSample || !canWrite ? "" : `<button class="del${pendingDel === m.id ? " confirm" : ""}" data-del="${esc(m.id)}">${pendingDel === m.id ? "本当に消す" : "削除"}</button>`}</td>
-      </tr>`).join("") : `<tr><td colspan="8" class="empty">記録がありません</td></tr>`;
+      </tr>`).join("") : `<tr><td colspan="9" class="empty">記録がありません</td></tr>`;
     $("more").hidden = rows.length <= shown;
   }
   $("more").addEventListener("click", () => { shown += 15; render(); });
@@ -1688,6 +1795,41 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     });
   }
   const sd = n => (n > 0 ? "+" : "") + n;
+
+  // ---- ページ分け: 縦に長くならないよう、見たいものだけ出す。狭い画面では「記録する」も1ページ
+  const PAGES = {
+    team: { view: "teamView", tabs: "teamPages", def: "sum", map: { "h-sum": "sum", "h-today": "sum", "h-rankb": "sum", "h-trend": "trend", "h-rank": "trend", "h-when": "trend", "h-fhero": "friends", "h-mem": "friends", "h-syn": "friends", "h-hero": "heroes", "h-enemy": "heroes", "h-map": "maps", "h-list": "history" } },
+    duel: { view: "duelView", tabs: "duelPages", def: "rank", map: { "h-dlb": "rank", "h-dvs": "rank", "h-driv": "rival", "h-dhero": "rival", "h-dlist": "history" } },
+  };
+  const narrowMq = window.matchMedia("(max-width: 900px)");
+  const pageOf = { team: lsGet("ow-page-team") || "sum", duel: lsGet("ow-page-duel") || "rank" };
+  function applyPage(k) {
+    const P = PAGES[k], view = $(P.view), narrow = narrowMq.matches;
+    let pg = pageOf[k];
+    if (!$(P.tabs).querySelector(`[data-v="${pg}"]`)) pg = P.def;
+    const colPg = pg === "add" ? (narrow ? null : P.def) : pg;
+    setPressed($(P.tabs), narrow || pg !== "add" ? pg : P.def);
+    const formPanel = view.querySelector(":scope > section.panel");
+    formPanel.hidden = narrow && pg !== "add";
+    const colEl = view.querySelector(":scope > .col");
+    colEl.hidden = !colPg;
+    colEl.querySelectorAll(":scope > section").forEach(sec => {
+      const h = sec.getAttribute("aria-labelledby");
+      if (!h) return; // 絞り込みはどのページでも出す
+      if (h === "h-dhero") return; // 1v1 Arena ではヒーローを記録しないので出さない
+      sec.hidden = P.map[h] !== colPg;
+    });
+  }
+  function setPage(k, pg) {
+    pageOf[k] = pg; lsSet("ow-page-" + k, pg); applyPage(k);
+    const nav = $(PAGES[k].tabs);
+    if (nav.getBoundingClientRect().top < 0) nav.scrollIntoView({ block: "start" });
+  }
+  Object.keys(PAGES).forEach(k => {
+    $(PAGES[k].tabs).addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) setPage(k, b.dataset.v); });
+    applyPage(k);
+  });
+  narrowMq.addEventListener("change", () => Object.keys(PAGES).forEach(applyPage));
 
   function setMode(m) {
     mode = m === "duel" ? "duel" : "team"; lsSet("ow-mode", mode);
@@ -1980,7 +2122,13 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     ["未プレイも表示", "Show unplayed", "미플레이도 표시"],
     ["試合の記録", "Match log", "경기 기록"],
     ["メンバー(ヒーロー・ランク変動)", "Players (hero, rank change)", "멤버(영웅·랭크 변동)"],
-    ["相手", "Enemies", "상대"],
+    ["相手", "Enemies", "상대"], ["味方", "Allies", "아군"],
+    ["記録する", "Record", "기록하기"], ["まとめ", "Summary", "요약"], ["推移", "Trends", "추이"], ["フレンド", "Friends", "친구"], ["ヒーロー", "Heroes", "영웅"], ["マップ", "Maps", "맵"], ["履歴", "History", "기록"], ["ランキング", "Ranking", "랭킹"], ["ライバル", "Rivals", "라이벌"], ["ページ", "Pages", "페이지"],
+    ["フレンドの使用ヒーロー", "Heroes friends played", "친구가 사용한 영웅"],
+    ["記録した試合で、フレンドがどのヒーローを使ったかです。名前を押すと、その人のヒーロー別の勝率と最近の試合が出ます。", "Which heroes each friend played in recorded matches. Tap a name to see their win rate per hero and recent matches.", "기록한 경기에서 친구가 어떤 영웅을 썼는지 보여줍니다. 이름을 누르면 영웅별 승률과 최근 경기가 나옵니다."],
+    ["試合を記録すると、フレンドごとの使用ヒーローがここに並びます。", "Record matches to see the heroes each friend used here.", "경기를 기록하면 친구별 사용 영웅이 여기에 표시됩니다."],
+    ["のヒーロー別", "— by hero", "의 영웅별"], ["最近の試合", "Recent matches", "최근 경기"], ["ヒーローなし", "No hero", "영웅 없음"], ["ヒーロー未記録", "No heroes recorded", "영웅 기록 없음"], ["ヒーローが記録されていません", "No heroes recorded", "기록된 영웅이 없습니다"], ["最後", "last", "마지막"],
+    ["味方のヒーロー(フレンド以外)", "Ally heroes (non-friends)", "아군 영웅(친구 제외)"], ["＋ 味方のヒーローを選ぶ", "+ Pick ally heroes", "+ 아군 영웅 선택"], ["味方のヒーローを選ぶ", "Pick ally heroes", "아군 영웅 선택"],
     ["メモ", "Note", "메모"],
     ["もっと見る", "Show more", "더 보기"],
     // 状態・メッセージ
@@ -2146,6 +2294,8 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     [/新しい\(ランク戦 (\d+)試合\)/g, ["Newer ($1 ranked matches)", "최신(경쟁전 $1경기)"]],
     [/友達にも同じ合言葉「(.+)」を入れてもらうと、このグループの記録を一緒に見られます。/g, ["Have friends enter the same passphrase \"$1\" to share this group's records.", "친구에게도 같은 암호 \"$1\"를 입력하게 하면 이 그룹의 기록을 함께 볼 수 있습니다."]],
     [/相手チームのヒーローを選ぶ\((\d+)\/6\)/g, ["Pick enemy heroes ($1/6)", "상대 팀 영웅 선택($1/6)"]],
+    [/味方のヒーローを選ぶ\((\d+)\/(\d+)\)/g, ["Pick ally heroes ($1/$2)", "아군 영웅 선택($1/$2)"]],
+    [/まだ選ばれていません\(最大(\d+)体\)/g, ["None picked yet (up to $1)", "아직 선택하지 않음(최대 $1명)"]],
     [/^(.+)は勝率(\d+%)で、全体\((\d+%)\)より低めです。$/g, ["$1: $2 win rate, lower than overall ($3).", "$1 승률은 $2로 전체($3)보다 낮습니다."]],
     [/(\d+)勝/g, ["$1W ", "$1승 "]], [/(\d+)敗/g, ["$1L ", "$1패 "]], [/(\d+)分/g, ["$1D ", "$1무 "]],
     [/(\d+)回/g, ["$1×", "$1회"]], [/(\d+)試合/g, ["$1 matches", "$1경기"]], [/(\d+)人/g, ["$1 players", "$1명"]], [/(\d+)位/g, ["#$1", "$1위"]],
@@ -2162,9 +2312,9 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     const li = LANGS[lang] - 1, m = exactMap[li], trim = text.trim();
     if (m.has(trim)) return text.replace(trim, m.get(trim));
     let out = text;
-    I18N_RX.slice(0, 8).forEach(([rx, rep]) => { out = out.replace(rx, (...a) => rep[li].replace(/\$(\d)/g, (_, d) => a[+d] && m.has(a[+d]) ? m.get(a[+d]) : a[+d])); });
+    I18N_RX.slice(0, 10).forEach(([rx, rep]) => { out = out.replace(rx, (...a) => rep[li].replace(/\$(\d)/g, (_, d) => a[+d] && m.has(a[+d]) ? m.get(a[+d]) : a[+d])); });
     out = out.replace(fragRx, k => m.get(k));
-    I18N_RX.slice(8).forEach(([rx, rep]) => { out = out.replace(rx, rep[li]); });
+    I18N_RX.slice(10).forEach(([rx, rep]) => { out = out.replace(rx, rep[li]); });
     return out;
   }
   const SKIP = ".nt, .name, .nm, .lang";
