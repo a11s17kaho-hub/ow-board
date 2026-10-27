@@ -240,6 +240,9 @@ td .who { display: block; white-space: nowrap; }
 .dside { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .dside .herobtn { flex: none; width: 100%; }
 .dside .herobtn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dknown { gap: 4px; }
+.dknown button { font-size: 12px; padding: 1px 8px; }
+.dknown button[aria-pressed="true"] { border-style: solid; border-color: var(--accent); color: var(--fg); font-weight: 700; }
 .vs { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--muted); align-self: center; }
 .score { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .score button { font: inherit; font-size: 18px; width: 36px; height: 36px; border: 1px solid var(--line); background: var(--chip); color: var(--fg); border-radius: 8px; cursor: pointer; flex: none; }
@@ -520,6 +523,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
           <div class="dside" id="dSide0">
             <span class="label">プレイヤー1</span>
             <input type="text" id="d0Name" list="nameList" maxlength="24" placeholder="名前" class="nt">
+            <div class="known dknown" id="d0Known"></div>
             <button type="button" class="herobtn" id="d0Hero"></button>
             <div class="score"><button type="button" data-sc="0" data-d="-1" aria-label="プレイヤー1のスコアを減らす">−</button><b id="d0Score">0</b><button type="button" data-sc="0" data-d="1" aria-label="プレイヤー1のスコアを増やす">＋</button></div>
           </div>
@@ -527,6 +531,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
           <div class="dside" id="dSide1">
             <span class="label">プレイヤー2</span>
             <input type="text" id="d1Name" list="nameList" maxlength="24" placeholder="名前" class="nt">
+            <div class="known dknown" id="d1Known"></div>
             <button type="button" class="herobtn" id="d1Hero"></button>
             <div class="score"><button type="button" data-sc="1" data-d="-1" aria-label="プレイヤー2のスコアを減らす">−</button><b id="d1Score">0</b><button type="button" data-sc="1" data-d="1" aria-label="プレイヤー2のスコアを増やす">＋</button></div>
           </div>
@@ -617,6 +622,17 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   ];
   const MAP_TYPE = {};
   MAPS.forEach(([t, ms]) => ms.forEach(m => MAP_TYPE[m] = t));
+  // カスタムゲームの1v1で選べるマップ(エリミネーション/デスマッチ用のアリーナと、ワークショップ用の空間)
+  const DUEL_MAPS = [
+    ["エリミネーション", ["Black Forest", "Castillo", "Ecopoint: Antarctica", "Necropolis"]],
+    ["デスマッチ", ["Château Guillard", "Kanezaka", "Malevento", "Petra"]],
+    ["ワークショップ", ["Workshop Chamber", "Workshop Expanse", "Workshop Island", "Workshop Green Screen"]],
+    ["その他", ["Other"]],
+  ];
+  const DUEL_MAP_TYPE = {};
+  DUEL_MAPS.forEach(([t, ms]) => ms.forEach(m => DUEL_MAP_TYPE[m] = t));
+  // アリーナには専用の絵がないので、雰囲気の近いマップの絵を借りる
+  const MAP_ART_ALIAS = { "Black Forest": "Eichenwalde", "Castillo": "Dorado", "Ecopoint: Antarctica": "Antarctic Peninsula", "Necropolis": "Throne of Anubis", "Château Guillard": "King's Row", "Kanezaka": "Hanaoka", "Malevento": "Rialto", "Petra": "Aatlis" };
   const MODE_ICON = {
     "コントロール": '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
     "エスコート": '<rect x="3" y="8" width="13" height="8" rx="1.5"/><path d="M16 11h3l2 3v2h-5"/><circle cx="7" cy="18" r="1.6" fill="currentColor"/><circle cx="17" cy="18" r="1.6" fill="currentColor"/>',
@@ -625,6 +641,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     "フラッシュポイント": '<path d="M13 3L5 13h6l-1 8 8-10h-6z"/>',
     "クラッシュ": '<path d="M4 4l16 16"/><path d="M20 4L4 20"/><path d="M4 9V4h5"/><path d="M20 15v5h-5"/>',
     "その他": '<circle cx="12" cy="12" r="3" fill="currentColor"/>',
+    "エリミネーション": '<circle cx="12" cy="12" r="8"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
+    "デスマッチ": '<path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>',
+    "ワークショップ": '<path d="M14 6l4 4-8 8H6v-4z"/><path d="M13 7l4 4"/>',
   };
   const icon = t => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${MODE_ICON[t] || MODE_ICON["その他"]}</svg>`;
   // ---- オリジナルのイラスト(ヒーローのエンブレムとマップの風景)(公式画像がないときの代わり)
@@ -757,6 +776,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     "Other": [L.sky("#9aa6ba", "#e6eaf0"), L.hills(66, "#8a96a8"), L.ground(78, "#6f7a8c")],
   };
   function mapArt(name) {
+    name = MAP_ART_ALIAS[name] || name;
     const mk = fileKey(name, "_");
     if (OFFICIAL_MAPS.has(mk)) return `<svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="160" height="90" fill="#1f2633"/><image href="maps/${mk}.jpg" width="160" height="90" preserveAspectRatio="xMidYMid slice"/></svg>`;
     const layers = MAP_ART[name] || MAP_ART["Other"];
@@ -956,11 +976,12 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   function closePicker() { pk = null; $("picker").hidden = true; document.body.style.overflow = ""; }
   function renderPicker() {
     if (!pk) return;
-    const tabs = pk.kind === "map" || pk.kind === "dmap" ? [["all", "すべて"], ...MAPS.filter(([t]) => t !== "その他").map(([t]) => [t, t])] : [["all", "すべて"], ...ROLES];
+    const mapList = pk.kind === "dmap" ? DUEL_MAPS : MAPS;
+    const tabs = pk.kind === "map" || pk.kind === "dmap" ? [["all", "すべて"], ...mapList.filter(([t]) => t !== "その他").map(([t]) => [t, t])] : [["all", "すべて"], ...ROLES];
     $("pkTabs").innerHTML = tabs.map(([k, ja]) => `<button type="button" data-tab="${esc(k)}" aria-pressed="${pkTab === k}">${esc(ja)}</button>`).join("");
     if (pk.kind === "map" || pk.kind === "dmap") {
       const cur = pk.kind === "dmap" ? dform.map : $("map").value;
-      $("pkBody").innerHTML = MAPS.filter(([t]) => pkTab === "all" || t === pkTab).map(([t, ms]) => `<div class="group"><h3><span class="gicon">${icon(t)}</span>${t}</h3>
+      $("pkBody").innerHTML = mapList.filter(([t]) => pkTab === "all" || t === pkTab).map(([t, ms]) => `<div class="group"><h3><span class="gicon">${icon(t)}</span>${t}</h3>
         <div class="mtiles">${ms.map(m => `<button type="button" class="mtile" data-map="${esc(m)}" aria-pressed="${m === cur}"><span class="art">${mapArt(m)}</span><span class="n">${esc(m)}</span></button>`).join("")}</div></div>`).join("");
       return;
     }
@@ -1537,8 +1558,38 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     $("dMapBtn").innerHTML = m ? `<span class="art">${mapArt(m)}</span><span class="mnm">${esc(m)}<small>変更</small></span>` : `<span class="mnm solo">マップなし<small>選ぶ</small></span>`;
     lsSet("ow-duel-map", m);
   }
+  // よく出てくる名前をボタンで並べ、押すとその側に入る(反対側と同じなら入れ替え)
+  function dKnownNames() {
+    const cnt = new Map();
+    Object.keys(players).forEach(n => cnt.set(n, 0));
+    matches.forEach(m => (m.members || []).forEach(x => { if (x && x.name) cnt.set(x.name, (cnt.get(x.name) || 0) + 1); }));
+    duels.forEach(d => [d.p1, d.p2].forEach(p => { if (p && p.name) cnt.set(p.name, (cnt.get(p.name) || 0) + 2); }));
+    return [...cnt.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0]).slice(0, 10);
+  }
+  function renderDKnown() {
+    const ks = dKnownNames();
+    [0, 1].forEach(i => {
+      const cur = dform.p[i].name.trim();
+      $(`d${i}Known`).innerHTML = ks.map(n => `<button type="button" class="nt" data-dk="${esc(n)}" data-side="${i}" aria-pressed="${n === cur}">${esc(n)}</button>`).join("");
+    });
+  }
+  function pickDName(i, n) {
+    const j = 1 - i;
+    if (dform.p[j].name.trim() === n) { const t = dform.p[i]; dform.p[i] = dform.p[j]; dform.p[j] = t; const sc = dform.s[i]; dform.s[i] = dform.s[j]; dform.s[j] = sc; }
+    else dform.p[i] = { name: n, hero: lastHeroOf(n) || dform.p[i].hero };
+    $("d0Name").value = dform.p[0].name; $("d1Name").value = dform.p[1].name;
+    renderDForm();
+  }
+  // その人が最後に1v1で使ったヒーローを初期値にする
+  function lastHeroOf(n) {
+    const ds = duels.slice().sort((x, y) => (x.createdAt || 0) - (y.createdAt || 0));
+    for (let k = ds.length - 1; k >= 0; k--) { const d = ds[k]; if (d.p1?.name === n && d.p1.hero) return d.p1.hero; if (d.p2?.name === n && d.p2.hero) return d.p2.hero; }
+    return "";
+  }
+  $("dform").addEventListener("click", e => { const b = e.target.closest("[data-dk]"); if (b) pickDName(+b.dataset.side, b.dataset.dk); });
   function updateDSubmit() {
     const a = dform.p[0].name.trim(), b = dform.p[1].name.trim();
+    renderDKnown();
     $("dSubmit").disabled = !(dcol && canWrite && a && b && a !== b);
   }
   [0, 1].forEach(i => {
@@ -1552,7 +1603,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   $("dMapBtn").addEventListener("click", () => openPicker({ kind: "dmap" }));
   $("dDate").value = today();
   try { const last = JSON.parse(lsGet("ow-duel-last") || "null"); if (Array.isArray(last)) last.slice(0, 2).forEach((p, i) => { if (p && typeof p.name === "string") { dform.p[i] = { name: p.name, hero: HERO_ROLE[p.hero] ? p.hero : "" }; $(`d${i}Name`).value = p.name; } }); } catch (e) {}
-  { const lm = lsGet("ow-duel-map"); setDMap(MAP_TYPE[lm] ? lm : ""); }
+  { const lm = lsGet("ow-duel-map"); setDMap(DUEL_MAP_TYPE[lm] ? lm : ""); }
   renderDForm();
   $("dform").addEventListener("submit", async e => {
     e.preventDefault();
@@ -1856,6 +1907,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["アンラン", "Anran", "안란"], ["アッシュ", "Ashe", "애쉬"], ["バスティオン", "Bastion", "바스티온"], ["キャスディ", "Cassidy", "캐서디"], ["エコー", "Echo", "에코"], ["エムレ", "Emre", "엠레"], ["フレイヤ", "Freja", "프레야"], ["ゲンジ", "Genji", "겐지"], ["ハンゾー", "Hanzo", "한조"], ["ジャンクラット", "Junkrat", "정크랫"], ["メイ", "Mei", "메이"], ["ファラ", "Pharah", "파라"], ["リーパー", "Reaper", "리퍼"], ["シオン", "Shion", "시온"], ["シエラ", "Sierra", "시에라"], ["ソジョーン", "Sojourn", "소전"], ["ソルジャー76", "Soldier: 76", "솔저: 76"], ["ソンブラ", "Sombra", "솜브라"], ["シンメトラ", "Symmetra", "시메트라"], ["トールビョーン", "Torbjörn", "토르비욘"], ["トレーサー", "Tracer", "트레이서"], ["ヴェンデッタ", "Vendetta", "벤데타"], ["ベンチャー", "Venture", "벤처"], ["ウィドウメイカー", "Widowmaker", "위도우메이커"],
     ["アナ", "Ana", "아나"], ["バティスト", "Baptiste", "바티스트"], ["ブリギッテ", "Brigitte", "브리기테"], ["ドクトリン", "Doctrine", "독트린"], ["イラリー", "Illari", "일리아리"], ["ジェットパック・キャット", "Jetpack Cat", "제트팩 캣"], ["ジュノ", "Juno", "주노"], ["キリコ", "Kiriko", "키리코"], ["ライフウィーバー", "Lifeweaver", "라이프위버"], ["ルシオ", "Lúcio", "루시우"], ["マーシー", "Mercy", "메르시"], ["ミズキ", "Mizuki", "미즈키"], ["モイラ", "Moira", "모이라"], ["ウーヤン", "Wuyang", "우양"], ["ゼニヤッタ", "Zenyatta", "젠야타"],
     ["共有データに接続できませんでした。通信を確認して、ページを開き直してください。下は架空のサンプルです。", "Couldn't reach the shared data. Check your connection and reload. Below is made-up sample data.", "공유 데이터에 연결할 수 없습니다. 통신을 확인하고 페이지를 다시 여세요. 아래는 가상의 샘플입니다."],
+    ["エリミネーション", "Elimination", "섬멸전"], ["デスマッチ", "Deathmatch", "데스매치"], ["ワークショップ", "Workshop", "워크샵"],
     // 1v1
     ["表示の切り替え", "Switch view", "보기 전환"],
     ["チーム戦", "Team", "팀전"],
