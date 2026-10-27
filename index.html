@@ -450,6 +450,18 @@ h2::before { content: ""; flex: none; width: 6px; height: 1.05em; background: li
 .mapcard .art img, .mapcard .art svg { transition: transform .3s ease; }
 .mapcard:hover .art svg { transform: scale(1.04); }
 th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
+/* アカウント */
+.acctbar { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; border-left: 4px solid var(--win); }
+.acctbar .anow { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.acctbar .anow b { font-size: 16px; overflow-wrap: anywhere; }
+.acctbar .aform { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.acctbar .aform input { width: 13em; }
+.gbtn { font: inherit; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 18px 8px 12px; cursor: pointer; box-shadow: var(--shadow); }
+.gbtn svg { width: 20px; height: 20px; display: block; }
+.ghost.primaryish { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.mygroups { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.gchip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--chip); color: var(--fg); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.gchip.out { background: none; color: var(--muted); border-style: dashed; }
 /* ページタブ */
 .pagetabs {
   grid-column: 1 / -1; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
@@ -509,13 +521,20 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
 
   <div class="status" id="status">共有データに接続しています…</div>
 
+    <section class="panel acctbar" id="acct" aria-label="アカウント" hidden>
+      <div class="anow" id="aNow"><span class="label">アカウント</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。</span></div>
+      <div class="aform" id="aForm"></div>
+    </section>
+
     <section class="panel groupbar" aria-label="グループ">
       <div class="gnow"><span class="label">いま見ているグループ</span><b id="gName">共通(グループなし)</b><span class="hint" id="gHint">合言葉を決めてグループに入ると、同じ合言葉を入れた友達どうしだけで記録を共有できます。</span></div>
       <div class="gform">
         <input type="text" id="gInput" maxlength="24" placeholder="合言葉(例: ow-nakama)" aria-label="グループの合言葉">
         <button type="button" class="ghost" id="gJoin">入る・作る</button>
         <button type="button" class="ghost" id="gLeave" hidden>共通に戻る</button>
+        <button type="button" class="ghost" id="gInvite" hidden>招待リンクをコピー</button>
       </div>
+      <div class="mygroups" id="myGroups" hidden></div>
     </section>
 
   <div class="modetabs" id="modeTabs" role="group" aria-label="表示の切り替え">
@@ -1740,6 +1759,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     if (!db) { s.hidden = false; s.textContent = "共有データに接続できませんでした。claude.ai にサインインした状態で開くと、みんなの記録が表示・追加できます。下は架空のサンプルです。"; return; }
     if (sample && mode === "duel") { s.hidden = false; s.textContent = "1v1がまだ記録されていないので、架空のサンプルで表示しています。最初の1戦を記録すると、本当の記録に切り替わります。"; return; }
     if (sample) { s.hidden = false; s.textContent = "まだ試合が記録されていないので、図は架空のサンプルデータで表示しています。最初の1試合を記録すると、みんなの本当の記録に切り替わります。"; return; }
+    if (!canWrite && auth) { s.hidden = false; s.textContent = authUser ? "記録に使う名前を決めると、記録を追加できます。" : "見るだけならログインはいりません。記録を追加するには、上の「Googleでログイン」を押してください。"; return; }
     if (!canWrite) { s.hidden = false; s.textContent = "閲覧のみです。記録を追加するには、このページの持ち主に編集者として招待してもらってください。"; return; }
     s.hidden = true;
   }
@@ -2123,6 +2143,12 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     ["試合の記録", "Match log", "경기 기록"],
     ["メンバー(ヒーロー・ランク変動)", "Players (hero, rank change)", "멤버(영웅·랭크 변동)"],
     ["相手", "Enemies", "상대"], ["味方", "Allies", "아군"],
+    ["アカウント", "Account", "계정"], ["ログインしていません", "Not signed in", "로그인하지 않음"], ["ログイン中", "Signed in", "로그인 중"], ["Googleでログイン", "Sign in with Google", "Google로 로그인"], ["ログアウト", "Sign out", "로그아웃"], ["名前を変える", "Change name", "이름 변경"], ["自分の戦績を見る", "My stats", "내 전적 보기"], ["決定", "OK", "확인"], ["やめる", "Cancel", "취소"],
+    ["記録に使う名前を決めてください", "Choose the name you record with", "기록에 쓸 이름을 정하세요"], ["自分のグループ", "My groups", "내 그룹"], ["このグループを一覧から外す", "Remove this group from my list", "이 그룹을 목록에서 빼기"], ["招待リンクをコピー", "Copy invite link", "초대 링크 복사"],
+    ["ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。", "Sign in to record under your own name and keep your groups. Only signed-in people can add records.", "로그인하면 내 이름으로 기록하고 들어간 그룹을 기억합니다. 기록 추가는 로그인한 사람만 할 수 있습니다."],
+    ["ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。", "This name appears in rankings and match records. Use the name you used before to keep your past records linked.", "랭킹과 경기 기록에 표시되는 이름입니다. 전에 쓰던 이름과 같게 하면 지금까지의 기록과 이어집니다."],
+    ["記録に使う名前を決めると、記録を追加できます。", "Choose your name to start adding records.", "이름을 정하면 기록을 추가할 수 있습니다."],
+    ["見るだけならログインはいりません。記録を追加するには、上の「Googleでログイン」を押してください。", "No sign-in needed to view. To add records, press \"Sign in with Google\" above.", "보기만 할 때는 로그인이 필요 없습니다. 기록을 추가하려면 위의 \"Google로 로그인\"을 누르세요."],
     ["記録する", "Record", "기록하기"], ["まとめ", "Summary", "요약"], ["推移", "Trends", "추이"], ["フレンド", "Friends", "친구"], ["ヒーロー", "Heroes", "영웅"], ["マップ", "Maps", "맵"], ["履歴", "History", "기록"], ["ランキング", "Ranking", "랭킹"], ["ライバル", "Rivals", "라이벌"], ["ページ", "Pages", "페이지"],
     ["フレンドの使用ヒーロー", "Heroes friends played", "친구가 사용한 영웅"],
     ["記録した試合で、フレンドがどのヒーローを使ったかです。名前を押すと、その人のヒーロー別の勝率と最近の試合が出ます。", "Which heroes each friend played in recorded matches. Tap a name to see their win rate per hero and recent matches.", "기록한 경기에서 친구가 어떤 영웅을 썼는지 보여줍니다. 이름을 누르면 영웅별 승률과 최근 경기가 나옵니다."],
@@ -2391,11 +2417,94 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     name = String(name || "").trim().slice(0, 24);
     group = name ? { id: gidOf(name), name } : { id: "", name: "" };
     lsSet("ow-group", group.name);
-    connect();
+    if (location.hash.startsWith("#g_")) history.replaceState(null, "", location.pathname + location.search);
+    if (me && group.name && !me.groups.includes(group.name)) { me.groups = [group.name, ...me.groups].slice(0, 12); saveMe(); }
+    connect(); renderAcct();
+  }
+
+  // ---- アカウント(Webサイト版だけ。Google でログイン)
+  // users/{uid} = { name: 記録に使う名前, groups: [入ったグループの合言葉] }
+  let auth = null, authUser = null, me = null, nameEditing = false;
+  const myName = () => me && me.name || "";
+  async function saveMe() {
+    if (!db || !authUser || !me) return;
+    try { await db.collection("users").doc(authUser.uid).set({ name: me.name.slice(0, 24), groups: me.groups.slice(0, 12), updatedAt: Date.now() }); } catch (e) {}
+  }
+  function useMyName() {
+    const n = myName(); if (!n) return;
+    if (!form.members.some(m => m.name === n)) { form.members.unshift({ name: n, hero: "", role: "", dir: 1, amt: "" }); form.members = form.members.slice(0, 6); renderMembers(); }
+    if (!dform.p[0].name && dform.p[1].name !== n) { dform.p[0].name = n; $("d0Name").value = n; renderDForm(); }
+  }
+  function renderAcct() {
+    const box = $("acct"); if (!auth) { box.hidden = true; return; }
+    box.hidden = false;
+    $("gInvite").hidden = !group.id;
+    const mg = me ? me.groups.filter(g => g !== group.name) : [];
+    $("myGroups").hidden = !mg.length && !(me && group.id);
+    $("myGroups").innerHTML = (mg.length ? `<span class="label">自分のグループ</span>` + mg.map(g => `<button type="button" class="gchip nt" data-g="${esc(g)}">${esc(g)}</button>`).join("") : "")
+      + (me && group.id ? `<button type="button" class="gchip out" data-gforget="${esc(group.name)}">このグループを一覧から外す</button>` : "");
+    if (!authUser) {
+      $("aNow").innerHTML = `<span class="label">アカウント</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。</span>`;
+      $("aForm").innerHTML = `<button type="button" class="gbtn" id="aIn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Googleでログイン</button>`;
+      return;
+    }
+    if (!me || !me.name || nameEditing) {
+      $("aNow").innerHTML = `<span class="label">アカウント</span><b>記録に使う名前を決めてください</b><span class="hint">ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。</span>`;
+      $("aForm").innerHTML = `<input type="text" id="aName" class="nt" maxlength="24" list="nameList" placeholder="名前" aria-label="記録に使う名前" value="${esc(myName() || (authUser.displayName || "").slice(0, 24))}"><button type="button" class="ghost primaryish" id="aSave">決定</button>${me && me.name ? `<button type="button" class="ghost" id="aCancel">やめる</button>` : ""}`;
+      return;
+    }
+    $("aNow").innerHTML = `<span class="label">ログイン中</span><b><span class="nt">${esc(me.name)}</span></b><span class="hint">${esc(authUser.email || "")}</span>`;
+    $("aForm").innerHTML = `<button type="button" class="ghost primaryish" id="aMine">自分の戦績を見る</button><button type="button" class="ghost" id="aRename">名前を変える</button><button type="button" class="ghost" id="aOut">ログアウト</button>`;
+  }
+  $("acct").addEventListener("click", async e => {
+    const id = e.target.closest("button") && e.target.closest("button").id;
+    if (id === "aIn") {
+      const pv = new firebase.auth.GoogleAuthProvider();
+      try { await auth.signInWithPopup(pv); }
+      catch (err) { if (err && /popup/.test(err.code || "")) { try { await auth.signInWithRedirect(pv); } catch (e2) {} } else { $("aNow").querySelector(".hint").textContent = "ログインできませんでした(" + (err && err.code || "エラー") + ")。もう一度押してください。"; } }
+    } else if (id === "aOut") { await auth.signOut(); }
+    else if (id === "aRename") { nameEditing = true; renderAcct(); $("aName").focus(); }
+    else if (id === "aCancel") { nameEditing = false; renderAcct(); }
+    else if (id === "aSave") {
+      const n = $("aName").value.trim().slice(0, 24); if (!n) { $("aName").focus(); return; }
+      me = { name: n, groups: me ? me.groups : (group.name ? [group.name] : []) }; nameEditing = false;
+      await saveMe(); canWrite = true; useMyName(); renderAcct(); setStatus(); updateSubmit(); updateDSubmit();
+    } else if (id === "aMine") {
+      $("fMember").value = me.name; lsSet("ow-fMember", me.name); $("fMember").dispatchEvent(new Event("change"));
+      setMode("team"); setPage("team", "sum");
+    }
+  });
+  $("acct").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "aName") { e.preventDefault(); $("aSave").click(); } });
+  $("myGroups").addEventListener("click", e => {
+    const b = e.target.closest("[data-g]"); if (b) { joinGroup(b.dataset.g); return; }
+    const f = e.target.closest("[data-gforget]"); if (f && me) { me.groups = me.groups.filter(g => g !== f.dataset.gforget); saveMe(); joinGroup(""); }
+  });
+  $("gInvite").addEventListener("click", async () => {
+    const url = location.origin + location.pathname + "#" + group.id;
+    try { await navigator.clipboard.writeText(url); $("gHint").textContent = "招待リンクをコピーしました。友達に送ると、開くだけでこのグループに入れます: " + url; }
+    catch (e) { $("gHint").textContent = "このリンクを友達に送ってください: " + url; }
+  });
+  async function startAuth() {
+    try {
+      await loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js");
+      auth = firebase.auth();
+    } catch (e) { auth = null; return; }
+    renderAcct();
+    auth.onAuthStateChanged(async u => {
+      authUser = u; me = null; nameEditing = false;
+      if (u) {
+        try { const d = await db.collection("users").doc(u.uid).get(); const v = d.exists ? d.data() : null; if (v) me = { name: String(v.name || ""), groups: Array.isArray(v.groups) ? v.groups.filter(g => typeof g === "string") : [] }; } catch (e) {}
+        if (me && group.name && !me.groups.includes(group.name)) { me.groups = [group.name, ...me.groups].slice(0, 12); saveMe(); }
+        if (me && !group.name && me.groups.length && !lsGet("ow-group-chosen")) joinGroup(me.groups[0]);
+        useMyName();
+      }
+      canWrite = !!(u && me && me.name);
+      renderAcct(); setStatus(); updateSubmit(); updateDSubmit();
+    });
   }
   $("gJoin").addEventListener("click", () => { const v = $("gInput").value.trim(); if (!v) { $("gInput").focus(); return; } $("gInput").value = ""; joinGroup(v); });
   $("gInput").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("gJoin").click(); } });
-  $("gLeave").addEventListener("click", () => joinGroup(""));
+  $("gLeave").addEventListener("click", () => { lsSet("ow-group-chosen", "1"); joinGroup(""); });
   {
     const h = location.hash.slice(1);
     const fromHash = /^g_[0-9a-f]+$/.test(h) ? nameOfGid(h) : "";
@@ -2421,6 +2530,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   (async () => {
     db = window.claude ? await window.claude.use("db") : await siteDb();
     if (!db) { setStatus(); updateSubmit(); return; }
+    if (onSite) { canWrite = false; await startAuth(); }
     try { const user = await window.claude.use("user"); if (user && (await user.can("data.write")) === false) canWrite = false; } catch (e) {}
     connect();
   })();
