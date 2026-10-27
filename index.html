@@ -547,7 +547,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
         </div>
         <div class="field"><span class="label">マップ</span><div class="mapbtn fixed" id="dMapBtn"></div></div>
         <label class="field"><span class="label">日付</span><input type="date" id="dDate"></label>
-        <label class="field"><span class="label">メモ(任意)</span><input type="text" id="dNote" maxlength="80" placeholder="例: ゲンジミラー、先取3"></label>
+        <label class="field"><span class="label">メモ(任意)</span><input type="text" id="dNote" maxlength="80" placeholder="例: 最後に逆転した"></label>
         <button class="primary" id="dSubmit" type="submit" disabled>記録する</button>
         <div class="toast" id="dToast" role="status"></div>
       </form>
@@ -560,7 +560,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
           <div class="tools"><label class="f dtools" hidden><span class="label">ルール</span><select id="dRuleF"><option value="">すべて</option><option value="arena">1v1 Arena</option><option value="mystery">ミステリー</option><option value="limited">リミテッド</option><option value="free">自由に選ぶ</option></select></label><label class="f dtools"><span class="label">期間</span><select id="dRange"><option value="all">全期間</option><option value="7">直近7日</option><option value="30">直近30日</option><option value="90">直近90日</option></select></label></div>
         </div>
         <div class="lb" id="dLb"></div>
-        <p class="hint">勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。ラウンド差は、取ったラウンドから取られたラウンドを引いた数です。</p>
+        <p class="hint">勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。キル差は、取ったキル(ポイント)から取られた数を引いたものです。</p>
       </section>
 
       <section class="panel" aria-labelledby="h-dvs">
@@ -1686,7 +1686,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
       <span class="c">${p.t.win}-${p.t.loss}${p.t.draw ? "-" + p.t.draw : ""}</span>
       <span class="c opt ${p.t.rf - p.t.ra > 0 ? "up" : p.t.rf - p.t.ra < 0 ? "down" : ""}">${sd(p.t.rf - p.t.ra)}</span>
       <span class="c opt">${p.t.n}</span></div>`;
-    $("dLb").innerHTML = ps.length ? `<div class="lbrow head"><span></span><span>プレイヤー</span><span class="c">勝率</span><span class="c">勝-敗</span><span class="c opt">ラウンド差</span><span class="c opt">試合数</span></div>`
+    $("dLb").innerHTML = ps.length ? `<div class="lbrow head"><span></span><span>プレイヤー</span><span class="c">勝率</span><span class="c">勝-敗</span><span class="c opt">キル差</span><span class="c opt">試合数</span></div>`
       + ok.map((p, i) => row(p, i, false)).join("") + few.map(p => row(p, 0, true)).join("")
       : `<div class="empty">1v1を記録すると、ここに順位が出ます。</div>`;
   }
@@ -1725,7 +1725,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     const recent = vs.slice(-12).reverse();
     $("dRival").innerHTML = `<div class="rival">
         <div class="rv"><span class="nt">${esc(a)}</span><span class="big${t.win > t.loss ? " lead" : ""}">${t.win}</span></div>
-        <div class="mid">${t.n}回対戦${t.draw ? `・引き分け${t.draw}` : ""}<br>ラウンド ${t.rf}-${t.ra}</div>
+        <div class="mid">${t.n}回対戦${t.draw ? `・引き分け${t.draw}` : ""}<br>キル ${t.rf}-${t.ra}</div>
         <div class="rv r"><span class="big${t.loss > t.win ? " lead" : ""}">${t.loss}</span><span class="nt">${esc(b)}</span></div>
       </div>
       ${wlBar(t)}
@@ -1949,7 +1949,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["アナ", "Ana", "아나"], ["バティスト", "Baptiste", "바티스트"], ["ブリギッテ", "Brigitte", "브리기테"], ["ドクトリン", "Doctrine", "독트린"], ["イラリー", "Illari", "일리아리"], ["ジェットパック・キャット", "Jetpack Cat", "제트팩 캣"], ["ジュノ", "Juno", "주노"], ["キリコ", "Kiriko", "키리코"], ["ライフウィーバー", "Lifeweaver", "라이프위버"], ["ルシオ", "Lúcio", "루시우"], ["マーシー", "Mercy", "메르시"], ["ミズキ", "Mizuki", "미즈키"], ["モイラ", "Moira", "모이라"], ["ウーヤン", "Wuyang", "우양"], ["ゼニヤッタ", "Zenyatta", "젠야타"],
     ["共有データに接続できませんでした。通信を確認して、ページを開き直してください。下は架空のサンプルです。", "Couldn't reach the shared data. Check your connection and reload. Below is made-up sample data.", "공유 데이터에 연결할 수 없습니다. 통신을 확인하고 페이지를 다시 여세요. 아래는 가상의 샘플입니다."],
     ["エリミネーション", "Elimination", "섬멸전"], ["デスマッチ", "Deathmatch", "데스매치"], ["ワークショップ", "Workshop", "워크샵"],
-    ["ルール", "Rule", "규칙"], ["ミステリー(ランダム)", "Mystery (random)", "미스터리(무작위)"], ["リミテッド(3体から)", "Limited (pick of 3)", "제한(3명 중)"], ["自由に選ぶ", "Free pick", "자유 선택"],
+    ["ルール", "Rule", "규칙"], ["キル", "Kills", "킬"], ["ルール:ワークショップ「1v1 Arena」", "Rule: Workshop \"1v1 Arena\"", "규칙: 워크샵 \"1v1 Arena\""], ["ミステリー(ランダム)", "Mystery (random)", "미스터리(무작위)"], ["リミテッド(3体から)", "Limited (pick of 3)", "제한(3명 중)"], ["自由に選ぶ", "Free pick", "자유 선택"],
     ["ミステリー", "Mystery", "미스터리"], ["リミテッド", "Limited", "제한"], ["ミステリー・リミテッドデュエル", "Mystery / Limited Duel", "미스터리·제한 결투"],
     ["1v1 ミステリーデュエル:毎ラウンド、2人とも同じヒーローがランダムで決まります。先に5本取ったほうの勝ち。ヒーローは選ばなくてOKです。", "1v1 Mystery Duel: each round both players get the same random hero. First to 5 wins. No need to pick heroes.", "1v1 미스터리 결투: 매 라운드 두 사람 모두 같은 영웅이 무작위로 정해집니다. 먼저 5승 하면 승리. 영웅은 고르지 않아도 됩니다."],
     ["1v1 リミテッドデュエル:毎ラウンド、同じ3体の中から選びます。先に5本取ったほうの勝ち。よく使ったヒーローを選んでおくと、ヒーロー別の成績に残ります(任意)。", "1v1 Limited Duel: each round both pick from the same 3 heroes. First to 5 wins. Pick the hero you used most to track it (optional).", "1v1 제한 결투: 매 라운드 같은 3명 중에서 고릅니다. 먼저 5승 하면 승리. 가장 많이 쓴 영웅을 고르면 영웅별 성적에 남습니다(선택)."],
@@ -1962,6 +1962,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["チーム戦", "Team", "팀전"],
     ["1v1(カスタム)", "1v1 (Custom)", "1v1(사용자 지정)"],
     ["1v1を記録", "Log a 1v1", "1v1 기록하기"],
+    ["カスタムゲームの1v1を記録します。", "Log your custom-game 1v1s.", "사용자 지정 게임의 1v1을 기록합니다."],
     ["カスタムゲームでの1対1の勝負を記録します。スコアは取ったラウンド数(例: 3対1)です。", "Log one-on-one games from custom matches. The score is rounds won (e.g. 3–1).", "사용자 지정 게임의 1대1 승부를 기록합니다. 점수는 이긴 라운드 수(예: 3대1)입니다."],
     ["プレイヤー1", "Player 1", "플레이어 1"],
     ["プレイヤー2", "Player 2", "플레이어 2"],
@@ -1974,9 +1975,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["マップ(任意)", "Map (optional)", "맵(선택)"],
     ["マップなし", "No map", "맵 없음"],
     ["選ぶ", "Pick", "선택"],
-    ["例: ゲンジミラー、先取3", "e.g. Genji mirror, first to 3", "예: 겐지 미러, 3선승"],
+    ["例: 最後に逆転した", "e.g. Comeback at the end", "예: 마지막에 역전"],
     ["1v1ランキング", "1v1 Ranking", "1v1 랭킹"],
-    ["勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。ラウンド差は、取ったラウンドから取られたラウンドを引いた数です。", "Win rate excludes draws. Players with fewer than 3 games are shown faded at the bottom. Round diff = rounds won minus rounds lost.", "승률은 무승부를 빼고 계산합니다. 3전 미만인 사람은 아래에 흐리게 표시합니다. 라운드 차는 이긴 라운드에서 진 라운드를 뺀 수입니다."],
+    ["勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。キル差は、取ったキル(ポイント)から取られた数を引いたものです。", "Win rate excludes draws. Players with fewer than 3 games are shown faded at the bottom. Kill diff = kills (points) scored minus conceded.", "승률은 무승부를 빼고 계산합니다. 3전 미만인 사람은 아래에 흐리게 표시합니다. 킬 차는 얻은 킬(포인트)에서 내준 수를 뺀 값입니다."],
     ["対戦表(だれに強いか)", "Head-to-head (who beats whom)", "상대 전적표(누구에게 강한가)"],
     ["行のプレイヤーから見た勝ち-負けです。青は勝ち越し、赤は負け越し。", "Wins–losses from the row player's side. Blue = winning record, red = losing record.", "행 플레이어 기준 승-패입니다. 파랑은 우세, 빨강은 열세."],
     ["ライバル対決", "Rivalry", "라이벌 대결"],
@@ -1984,7 +1985,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["1v1の記録", "1v1 history", "1v1 기록"],
     ["スコア", "Score", "점수"],
     ["勝-敗", "W-L", "승-패"],
-    ["ラウンド差", "Round diff", "라운드 차"],
+    ["キル差", "Kill diff", "킬 차"],
     ["連勝中", "-win streak", "연승 중"],
     ["連敗中", "-loss streak", "연패 중"],
     ["1v1を記録すると、ここに順位が出ます。", "Log a 1v1 to see the standings here.", "1v1을 기록하면 여기에 순위가 나옵니다."],
