@@ -1,0 +1,16 @@
+rules_version = '2';
+// 友達どうしで使う前提のルール。読み書きは matches / players / duels だけ許可し、1件の大きさを制限する
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function okCol(c) { return c in ['matches', 'players', 'duels']; }
+    function okDoc() { return request.resource.data.size() <= 20; }
+    match /{c}/{id} {
+      allow read, delete: if okCol(c);
+      allow create, update: if okCol(c) && okDoc();
+    }
+    match /groups/{g}/{c}/{id} {
+      allow read, delete: if okCol(c);
+      allow create, update: if okCol(c) && okDoc();
+    }
+  }
+}
