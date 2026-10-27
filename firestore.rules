@@ -16,6 +16,10 @@ service cloud.firestore {
       allow delete: if okCol(c) && signedIn();
       allow create, update: if okCol(c) && signedIn() && okDoc();
     }
+    // 全体ランキング用(全グループの試合をまとめて読む)
+    match /{path=**}/matches/{id} {
+      allow read: if true;
+    }
     match /users/{uid} {
       allow read, delete: if signedIn() && request.auth.uid == uid;
       allow create, update: if signedIn() && request.auth.uid == uid && request.resource.data.size() <= 5;

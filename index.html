@@ -450,6 +450,38 @@ h2::before { content: ""; flex: none; width: 6px; height: 1.05em; background: li
 .mapcard .art img, .mapcard .art svg { transition: transform .3s ease; }
 .mapcard:hover .art svg { transform: scale(1.04); }
 th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
+/* 履歴(カード) */
+.hist { display: flex; flex-direction: column; gap: 8px; }
+.hrow { --rc: var(--draw); display: grid; grid-template-columns: 74px 128px minmax(0, 1fr) auto; align-items: stretch; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.hrow.win { --rc: var(--win); } .hrow.loss { --rc: var(--loss); }
+.hres { display: grid; place-items: center; background: var(--rc); color: #fff; font-family: var(--font-display); font-style: italic; font-weight: 800; font-size: 20px; letter-spacing: .06em; }
+.hart { position: relative; display: block; min-height: 72px; }
+.hart svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hmain { display: flex; flex-direction: column; gap: 6px; padding: 8px 12px; min-width: 0; }
+.htop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.htop b { font-size: 15px; }
+.hmeta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hmem { display: flex; flex-wrap: wrap; gap: 6px; }
+.mchip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; font-weight: 700; }
+.mchip .mav { width: 26px; height: 26px; display: block; } .mchip .mav svg { width: 100%; height: 100%; display: block; }
+.mchip .rolebadge { margin-left: 4px; }
+.mchip b { font-size: 12px; }
+.hteams { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.hk { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+.hnote { font-size: 12px; color: var(--muted); }
+.hrow .del { align-self: center; margin-right: 10px; }
+@media (max-width: 640px) {
+  .hrow { grid-template-columns: 56px minmax(0, 1fr) auto; }
+  .hart { display: none; }
+  .hres { font-size: 15px; }
+}
+.scope { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--chip); }
+.scope button { font: inherit; font-size: 13px; font-weight: 700; border: none; background: none; color: var(--muted); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+.scope button[aria-pressed="true"] { background: var(--band); color: var(--band-fg); }
+.sampletag { margin-left: auto; align-self: center; flex: none; font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: 12px; letter-spacing: .12em; color: var(--muted); border: 1px dashed var(--line); border-radius: 6px; padding: 2px 8px; }
+.groupbar .gnow b { font-family: var(--font-display); font-style: italic; font-weight: 800; font-size: 26px; letter-spacing: .04em; line-height: 1.1; text-transform: uppercase; }
+.groupbar .gnow .label, .acctbar .anow .label { font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 13px; letter-spacing: .2em; color: var(--accent); }
+#gJoin, #gLeave { font-family: var(--font-display); font-style: italic; font-weight: 700; letter-spacing: .1em; font-size: 15px; }
 /* アカウント */
 .acctbar { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; border-left: 4px solid var(--win); }
 .acctbar .anow { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -522,17 +554,17 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   <div class="status" id="status">共有データに接続しています…</div>
 
     <section class="panel acctbar" id="acct" aria-label="アカウント" hidden>
-      <div class="anow" id="aNow"><span class="label">アカウント</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。</span></div>
+      <div class="anow" id="aNow"><span class="label">PLAYER</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。</span></div>
       <div class="aform" id="aForm"></div>
     </section>
 
     <section class="panel groupbar" aria-label="グループ">
-      <div class="gnow"><span class="label">いま見ているグループ</span><b id="gName">共通(グループなし)</b><span class="hint" id="gHint">合言葉を決めてグループに入ると、同じ合言葉を入れた友達どうしだけで記録を共有できます。</span></div>
+      <div class="gnow"><span class="label">SQUAD</span><b id="gName">OPEN LOBBY</b><span class="hint" id="gHint"></span></div>
       <div class="gform">
-        <input type="text" id="gInput" maxlength="24" placeholder="合言葉(例: ow-nakama)" aria-label="グループの合言葉">
-        <button type="button" class="ghost" id="gJoin">入る・作る</button>
-        <button type="button" class="ghost" id="gLeave" hidden>共通に戻る</button>
-        <button type="button" class="ghost" id="gInvite" hidden>招待リンクをコピー</button>
+        <input type="text" id="gInput" maxlength="24" placeholder="スクワッドコード" aria-label="スクワッドコード">
+        <button type="button" class="ghost primaryish" id="gJoin">JOIN</button>
+        <button type="button" class="ghost" id="gInvite" hidden>招待リンク</button>
+        <button type="button" class="ghost" id="gLeave" hidden>LEAVE</button>
       </div>
       <div class="mygroups" id="myGroups" hidden></div>
     </section>
@@ -551,6 +583,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       <button type="button" data-v="heroes">ヒーロー</button>
       <button type="button" data-v="maps">マップ</button>
       <button type="button" data-v="history">履歴</button>
+      <span class="sampletag" hidden title="記録がまだないので、見本のデータを表示しています">SAMPLE</span>
     </nav>
     <section class="panel" aria-labelledby="h-add">
       <h2 id="h-add">試合を記録</h2>
@@ -630,6 +663,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       <section class="panel" aria-labelledby="h-rankb">
         <div class="phead">
           <h2 id="h-rankb">ランキング</h2>
+          <div class="scope" id="lbScope" hidden><button type="button" data-v="group" aria-pressed="true">フレンド</button><button type="button" data-v="global" aria-pressed="false">全体</button></div>
           <div class="seg2" id="lbSort">
             <button type="button" data-v="rate" aria-pressed="true">勝率</button>
             <button type="button" data-v="gain" aria-pressed="false">上がり幅</button>
@@ -714,10 +748,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
 
       <section class="panel" aria-labelledby="h-list">
         <h2 id="h-list">試合の記録</h2>
-        <div class="tablewrap"><table>
-          <thead><tr><th>日付</th><th>結果</th><th>マップ</th><th>モード</th><th>メンバー(ヒーロー・ランク変動)</th><th>味方</th><th>相手</th><th>メモ</th><th></th></tr></thead>
-          <tbody id="rows"></tbody>
-        </table></div>
+        <div class="hist" id="rows"></div>
         <button class="ghost more" id="more" hidden>もっと見る</button>
       </section>
     </div>
@@ -728,6 +759,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       <button type="button" data-v="rank">ランキング</button>
       <button type="button" data-v="rival">ライバル</button>
       <button type="button" data-v="history">履歴</button>
+      <span class="sampletag" hidden title="記録がまだないので、見本のデータを表示しています">SAMPLE</span>
     </nav>
     <section class="panel" aria-labelledby="h-dadd">
       <h2 id="h-dadd">1v1を記録</h2>
@@ -1016,7 +1048,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   const TIERS = [["ブロンズ", "#a2693c"], ["シルバー", "#9aa4b1"], ["ゴールド", "#d4a420"], ["プラチナ", "#4fa3a5"], ["ダイヤモンド", "#5a8ee6"], ["マスター", "#3fb27f"], ["グランドマスター", "#9b6be0"], ["チャンピオン", "#e0655a"]];
   const PLATFORMS = [["pc", "PC"], ["ps", "PlayStation"], ["xbox", "Xbox"], ["switch", "Switch"]];
   const PLAT_LABEL = Object.fromEntries(PLATFORMS);
-  const RES_LABEL = { win: "勝ち", loss: "負け", draw: "引分" };
+  const RES_LABEL = { win: "WIN", loss: "LOSE", draw: "DRAW" };
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -1072,6 +1104,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
 
   // ---- 状態
   let db = null, col = null, pcol = null, canWrite = true;
+  let auth = null, authUser = null, me = null, nameEditing = false;
   let matches = [], players = {};
   let isSample = true, shown = 15, editing = null, pendingDel = null;
   const form = { result: null, queue: "ランク", members: [], enemies: [], allies: [] };
@@ -1276,11 +1309,13 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       }),
       enemies: form.enemies.slice(0, 6),
       allies: form.allies.slice(0, allyMax()),
+      ...(authUser && myName() ? { uids: [authUser.uid] } : {}),
       note: $("note").value.trim().slice(0, 80), createdAt: Date.now(),
     };
+    if (doc.uids) doc.members = doc.members.map(x => x.name === myName() ? { ...x, uid: authUser.uid } : x);
     $("submit").disabled = true;
     try {
-      await col.add(doc);
+      await col.add(doc); gMatches = null;
       let notes = [];
       try { notes = await applyRankChanges(doc.members, 1); } catch (err) {}
       lsSet("ow-last-members", JSON.stringify(form.members.map(m => ({ name: m.name, hero: m.hero, role: m.role }))));
@@ -1400,7 +1435,29 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   // ---- ランキング(このページを使っている人の中での順位)
   let lbKey = lsGet("ow-lb") || "rate", lbShown = 10;
   const MIN_GAMES = 3, LB_MAX = 50;
+  // 全体ランキング: サイトの全グループの試合のうち、ログインした本人が記録に入っているもの(uids)をアカウントごとに数える
+  let lbScope = "group", gMatches = null, gLoadedAt = 0, gLoading = false;
+  async function loadGlobal() {
+    if (!db || !db.collectionGroup || gLoading || (gMatches && Date.now() - gLoadedAt < 60000)) return;
+    gLoading = true;
+    try { const snap = await db.collectionGroup("matches").limit(5000).get(); gMatches = snap.docs.map(d => d.data()).filter(m => m.result && m.date && Array.isArray(m.uids)); gLoadedAt = Date.now(); }
+    catch (e) { gMatches = []; }
+    gLoading = false; renderLeaderboard();
+  }
+  function globalRows() {
+    const range = $("fRange").value, q = $("fQueue").value; let since = null;
+    if (range !== "all") { const d = new Date(); d.setDate(d.getDate() - (+range - 1)); since = isoDay(d); }
+    const per = new Map();
+    (gMatches || []).filter(m => (!since || m.date >= since) && (!q || m.queue === q)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).forEach(m => (m.members || []).forEach(x => {
+      if (!x.uid || !m.uids.includes(x.uid)) return;
+      if (!per.has(x.uid)) per.set(x.uid, { name: x.name, pf: "", ms: [], gain: 0, rn: 0 });
+      const p = per.get(x.uid); p.name = x.name || p.name; p.ms.push(m); if (x.delta) { p.gain += x.delta; p.rn++; }
+    }));
+    return [...per.values()].map(p => ({ ...p, t: tally(p.ms), slope: p.rn ? p.gain / p.rn : null }));
+  }
+  $("lbScope").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; lbScope = b.dataset.v; setPressed($("lbScope"), lbScope); if (lbScope === "global") loadGlobal(); renderLeaderboard(); });
   function lbRows() {
+    if (lbScope === "global") return globalRows();
     const list = filtered(true), plat = $("lbPlat").value, P = curPlayers();
     const per = new Map();
     list.forEach(m => (m.members || []).forEach(x => {
@@ -1418,6 +1475,9 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   const fmtSlope = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + Math.abs(v).toFixed(1) + "%";
   function renderLeaderboard() {
     setPressed($("lbSort"), lbKey);
+    $("lbScope").hidden = !auth;
+    $("lbPlat").closest(".filters").hidden = lbScope === "global";
+    if (lbScope === "global" && !gMatches) { $("lbTop").innerHTML = ""; $("lb").innerHTML = `<div class="empty">全体のランキングを読み込んでいます…</div>`; $("lbHint").textContent = ""; $("lbMore").hidden = true; return; }
     const rows = lbRows();
     // 各部門の1位をまとめて先に見せる
     const best = [["rate", "勝率1位", r => pct(r.t.rate), r => `${r.t.win}勝${r.t.loss}敗`],
@@ -1435,8 +1495,8 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       gain: "ランク戦で入れた%の合計です。+80%なら、その期間で合計80%ぶんランクが上がっています。",
       slope: "1試合ごとに平均で何%ランクが動いたかです。+3.0%なら、1試合ごとに平均3%ずつ上がっている勢いです。",
       n: "記録された試合数の多い順です。",
-    }[lbKey] + "「上位◯%」は、この順位表に入っている人の中での位置です。";
-    if (!rows.length) { $("lb").innerHTML = `<div class="empty">試合を記録すると、メンバーの順位がここに出ます。</div>`; $("lbMore").hidden = true; return; }
+    }[lbKey] + (lbScope === "global" ? "全体は、このサイトでログインして記録した人全員の順位です(ログインした本人が入っている試合だけ数えます)。" : "「上位◯%」は、この順位表に入っている人の中での位置です。");
+    if (!rows.length) { $("lb").innerHTML = `<div class="empty">${lbScope === "global" ? "まだ全体ランキングに入っている人がいません。ログインして試合を記録すると載ります。" : "試合を記録すると、メンバーの順位がここに出ます。"}</div>`; $("lbMore").hidden = true; return; }
     const show = N <= 10 ? N : Math.min(lbShown, N);
     const cell = (k, txt, opt) => `<span class="c${k === lbKey ? " on" : ""}${opt ? " opt" : ""}">${txt}</span>`;
     const line = (r, i) => `<div class="lbrow${i < 3 && i >= 0 ? " p" + (i + 1) : ""}${i < 0 ? " dim" : ""}">
@@ -1723,18 +1783,19 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
 
   function renderRows(list) {
     const rows = list.slice().reverse();
+    const mini = hs => hs.map(h => `<span title="${esc(h)}">${heroEmblem(h, HERO_ROLE[h])}</span>`).join("");
     $("rows").innerHTML = rows.length ? rows.slice(0, shown).map(m => `
-      <tr>
-        <td class="num">${esc(m.date)}</td>
-        <td><span class="pill ${esc(m.result)}">${RES_LABEL[m.result] || "?"}</span></td>
-        <td>${esc(m.map)}</td>
-        <td>${esc(m.queue)}</td>
-        <td>${(m.members || []).map(x => `<span class="who"><span class="nt">${esc(x.name)}</span>${x.hero ? ` <span class="label">${esc(x.hero)}</span>` : x.role ? ` <span class="label">${ROLE_JA[x.role] || ""}</span>` : ""}${x.delta ? ` <b class="${x.delta > 0 ? "up" : "down"}">${x.delta > 0 ? "▲" : "▼"}${Math.abs(x.delta)}%</b>` : ""}</span>`).join("")}</td>
-        <td><span class="mini">${(m.allies || []).map(h => `<span title="${esc(h)}">${heroEmblem(h, HERO_ROLE[h])}</span>`).join("")}</span></td>
-        <td><span class="mini">${(m.enemies || []).map(h => `<span title="${esc(h)}">${heroEmblem(h, HERO_ROLE[h])}</span>`).join("")}</span></td>
-        <td>${esc(m.note)}</td>
-        <td>${isSample || !canWrite ? "" : `<button class="del${pendingDel === m.id ? " confirm" : ""}" data-del="${esc(m.id)}">${pendingDel === m.id ? "本当に消す" : "削除"}</button>`}</td>
-      </tr>`).join("") : `<tr><td colspan="9" class="empty">記録がありません</td></tr>`;
+      <article class="hrow ${esc(m.result)}">
+        <span class="hres">${RES_LABEL[m.result] || "?"}</span>
+        <span class="hart">${mapArt(m.map)}</span>
+        <div class="hmain">
+          <div class="htop"><b>${esc(m.map)}</b><span class="hmeta">${esc(m.date)} · ${esc(m.queue)}</span></div>
+          <div class="hmem">${(m.members || []).map(x => `<span class="mchip">${x.hero ? `<span class="mav" title="${esc(x.hero)}">${heroEmblem(x.hero, HERO_ROLE[x.hero])}</span>` : x.role ? `<span class="rolebadge ${esc(x.role)}">${ROLE_JA[x.role] || ""}</span>` : ""}<span class="nt">${esc(x.name)}</span>${x.delta ? `<b class="${x.delta > 0 ? "up" : "down"}">${x.delta > 0 ? "▲" : "▼"}${Math.abs(x.delta)}%</b>` : ""}</span>`).join("")}</div>
+          ${(m.allies || []).length || (m.enemies || []).length ? `<div class="hteams">${(m.allies || []).length ? `<span class="hk">味方</span><span class="mini">${mini(m.allies)}</span>` : ""}${(m.enemies || []).length ? `<span class="hk">相手</span><span class="mini">${mini(m.enemies)}</span>` : ""}</div>` : ""}
+          ${m.note ? `<div class="hnote">${esc(m.note)}</div>` : ""}
+        </div>
+        ${isSample || !canWrite ? "" : `<button class="del${pendingDel === m.id ? " confirm" : ""}" data-del="${esc(m.id)}">${pendingDel === m.id ? "本当に消す" : "削除"}</button>`}
+      </article>`).join("") : `<div class="empty">記録がありません</div>`;
     $("more").hidden = rows.length <= shown;
   }
   $("more").addEventListener("click", () => { shown += 15; render(); });
@@ -1757,8 +1818,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     s.classList.toggle("sample", sample);
     if (!db && window.OW_FIREBASE) { s.hidden = false; s.textContent = "共有データに接続できませんでした。通信を確認して、ページを開き直してください。下は架空のサンプルです。"; return; }
     if (!db) { s.hidden = false; s.textContent = "共有データに接続できませんでした。claude.ai にサインインした状態で開くと、みんなの記録が表示・追加できます。下は架空のサンプルです。"; return; }
-    if (sample && mode === "duel") { s.hidden = false; s.textContent = "1v1がまだ記録されていないので、架空のサンプルで表示しています。最初の1戦を記録すると、本当の記録に切り替わります。"; return; }
-    if (sample) { s.hidden = false; s.textContent = "まだ試合が記録されていないので、図は架空のサンプルデータで表示しています。最初の1試合を記録すると、みんなの本当の記録に切り替わります。"; return; }
+    document.querySelectorAll(".sampletag").forEach(t => t.hidden = !(db && sample));
     if (!canWrite && auth) { s.hidden = false; s.textContent = authUser ? "記録に使う名前を決めると、記録を追加できます。" : "見るだけならログインはいりません。記録を追加するには、上の「Googleでログイン」を押してください。"; return; }
     if (!canWrite) { s.hidden = false; s.textContent = "閲覧のみです。記録を追加するには、このページの持ち主に編集者として招待してもらってください。"; return; }
     s.hidden = true;
@@ -2143,6 +2203,11 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     ["試合の記録", "Match log", "경기 기록"],
     ["メンバー(ヒーロー・ランク変動)", "Players (hero, rank change)", "멤버(영웅·랭크 변동)"],
     ["相手", "Enemies", "상대"], ["味方", "Allies", "아군"],
+    ["フレンド", "Friends", "친구"], ["全体", "Global", "전체"], ["スクワッドコード", "Squad code", "스쿼드 코드"], ["招待リンク", "Invite link", "초대 링크"], ["一覧から外す", "Remove from list", "목록에서 빼기"], ["記録がまだないので、見本のデータを表示しています", "No records yet, showing sample data", "아직 기록이 없어 예시 데이터를 보여줍니다"],
+    ["だれでも入れる共通ロビー。コードを決めて JOIN すると、仲間だけのスクワッドができます。", "The shared open lobby. Pick a code and JOIN to make a squad just for your crew.", "누구나 들어오는 공용 로비. 코드를 정해 JOIN 하면 친구들만의 스쿼드가 생깁니다."],
+    ["全体のランキングを読み込んでいます…", "Loading the global ranking…", "전체 랭킹을 불러오는 중…"],
+    ["まだ全体ランキングに入っている人がいません。ログインして試合を記録すると載ります。", "No one is on the global ranking yet. Sign in and record matches to appear.", "아직 전체 랭킹에 아무도 없습니다. 로그인해서 경기를 기록하면 올라갑니다."],
+    ["全体は、このサイトでログインして記録した人全員の順位です(ログインした本人が入っている試合だけ数えます)。", "Global ranks everyone who signed in and recorded on this site (only matches that include the signed-in player count).", "전체는 이 사이트에 로그인해 기록한 모든 사람의 순위입니다(로그인한 본인이 들어간 경기만 셉니다)."],
     ["アカウント", "Account", "계정"], ["ログインしていません", "Not signed in", "로그인하지 않음"], ["ログイン中", "Signed in", "로그인 중"], ["Googleでログイン", "Sign in with Google", "Google로 로그인"], ["ログアウト", "Sign out", "로그아웃"], ["名前を変える", "Change name", "이름 변경"], ["自分の戦績を見る", "My stats", "내 전적 보기"], ["決定", "OK", "확인"], ["やめる", "Cancel", "취소"],
     ["記録に使う名前を決めてください", "Choose the name you record with", "기록에 쓸 이름을 정하세요"], ["自分のグループ", "My groups", "내 그룹"], ["このグループを一覧から外す", "Remove this group from my list", "이 그룹을 목록에서 빼기"], ["招待リンクをコピー", "Copy invite link", "초대 링크 복사"],
     ["ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。", "Sign in to record under your own name and keep your groups. Only signed-in people can add records.", "로그인하면 내 이름으로 기록하고 들어간 그룹을 기억합니다. 기록 추가는 로그인한 사람만 할 수 있습니다."],
@@ -2321,6 +2386,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     [/友達にも同じ合言葉「(.+)」を入れてもらうと、このグループの記録を一緒に見られます。/g, ["Have friends enter the same passphrase \"$1\" to share this group's records.", "친구에게도 같은 암호 \"$1\"를 입력하게 하면 이 그룹의 기록을 함께 볼 수 있습니다."]],
     [/相手チームのヒーローを選ぶ\((\d+)\/6\)/g, ["Pick enemy heroes ($1/6)", "상대 팀 영웅 선택($1/6)"]],
     [/味方のヒーローを選ぶ\((\d+)\/(\d+)\)/g, ["Pick ally heroes ($1/$2)", "아군 영웅 선택($1/$2)"]],
+    [/^コード「(.+)」の仲間だけの戦績ボード。招待リンクで仲間を呼べます。$/g, ["Squad \"$1\" — a board just for your crew. Bring friends in with the invite link.", "코드 \"$1\" 친구들만의 전적 보드. 초대 링크로 친구를 부르세요."]],
     [/まだ選ばれていません\(最大(\d+)体\)/g, ["None picked yet (up to $1)", "아직 선택하지 않음(최대 $1명)"]],
     [/^(.+)は勝率(\d+%)で、全体\((\d+%)\)より低めです。$/g, ["$1: $2 win rate, lower than overall ($3).", "$1 승률은 $2로 전체($3)보다 낮습니다."]],
     [/(\d+)勝/g, ["$1W ", "$1승 "]], [/(\d+)敗/g, ["$1L ", "$1패 "]], [/(\d+)分/g, ["$1D ", "$1무 "]],
@@ -2338,9 +2404,9 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     const li = LANGS[lang] - 1, m = exactMap[li], trim = text.trim();
     if (m.has(trim)) return text.replace(trim, m.get(trim));
     let out = text;
-    I18N_RX.slice(0, 10).forEach(([rx, rep]) => { out = out.replace(rx, (...a) => rep[li].replace(/\$(\d)/g, (_, d) => a[+d] && m.has(a[+d]) ? m.get(a[+d]) : a[+d])); });
+    I18N_RX.slice(0, 11).forEach(([rx, rep]) => { out = out.replace(rx, (...a) => rep[li].replace(/\$(\d)/g, (_, d) => a[+d] && m.has(a[+d]) ? m.get(a[+d]) : a[+d])); });
     out = out.replace(fragRx, k => m.get(k));
-    I18N_RX.slice(10).forEach(([rx, rep]) => { out = out.replace(rx, rep[li]); });
+    I18N_RX.slice(11).forEach(([rx, rep]) => { out = out.replace(rx, rep[li]); });
     return out;
   }
   const SKIP = ".nt, .name, .nm, .lang";
@@ -2381,8 +2447,8 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   const nameOfGid = gid => { try { const hex = gid.slice(2); return new TextDecoder().decode(new Uint8Array(hex.match(/../g).map(h => parseInt(h, 16)))); } catch (e) { return ""; } };
   const colPath = n => group.id ? `groups/${group.id}/${n}` : n;
   function showGroup() {
-    $("gName").textContent = group.id ? group.name : "共通(グループなし)";
-    $("gHint").textContent = group.id ? `友達にも同じ合言葉「${group.name}」を入れてもらうと、このグループの記録を一緒に見られます。` : "合言葉を決めてグループに入ると、同じ合言葉を入れた友達どうしだけで記録を共有できます。";
+    $("gName").textContent = group.id ? group.name : "OPEN LOBBY";
+    $("gHint").textContent = group.id ? `コード「${group.name}」の仲間だけの戦績ボード。招待リンクで仲間を呼べます。` : "だれでも入れる共通ロビー。コードを決めて JOIN すると、仲間だけのスクワッドができます。";
     $("gLeave").hidden = !group.id;
   }
   function connect() {
@@ -2424,7 +2490,6 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
 
   // ---- アカウント(Webサイト版だけ。Google でログイン)
   // users/{uid} = { name: 記録に使う名前, groups: [入ったグループの合言葉] }
-  let auth = null, authUser = null, me = null, nameEditing = false;
   const myName = () => me && me.name || "";
   async function saveMe() {
     if (!db || !authUser || !me) return;
@@ -2441,19 +2506,19 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     $("gInvite").hidden = !group.id;
     const mg = me ? me.groups.filter(g => g !== group.name) : [];
     $("myGroups").hidden = !mg.length && !(me && group.id);
-    $("myGroups").innerHTML = (mg.length ? `<span class="label">自分のグループ</span>` + mg.map(g => `<button type="button" class="gchip nt" data-g="${esc(g)}">${esc(g)}</button>`).join("") : "")
-      + (me && group.id ? `<button type="button" class="gchip out" data-gforget="${esc(group.name)}">このグループを一覧から外す</button>` : "");
+    $("myGroups").innerHTML = (mg.length ? `<span class="label">MY SQUADS</span>` + mg.map(g => `<button type="button" class="gchip nt" data-g="${esc(g)}">${esc(g)}</button>`).join("") : "")
+      + (me && group.id ? `<button type="button" class="gchip out" data-gforget="${esc(group.name)}">一覧から外す</button>` : "");
     if (!authUser) {
-      $("aNow").innerHTML = `<span class="label">アカウント</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。</span>`;
+      $("aNow").innerHTML = `<span class="label">PLAYER</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。</span>`;
       $("aForm").innerHTML = `<button type="button" class="gbtn" id="aIn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Googleでログイン</button>`;
       return;
     }
     if (!me || !me.name || nameEditing) {
-      $("aNow").innerHTML = `<span class="label">アカウント</span><b>記録に使う名前を決めてください</b><span class="hint">ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。</span>`;
+      $("aNow").innerHTML = `<span class="label">PLAYER</span><b>記録に使う名前を決めてください</b><span class="hint">ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。</span>`;
       $("aForm").innerHTML = `<input type="text" id="aName" class="nt" maxlength="24" list="nameList" placeholder="名前" aria-label="記録に使う名前" value="${esc(myName() || (authUser.displayName || "").slice(0, 24))}"><button type="button" class="ghost primaryish" id="aSave">決定</button>${me && me.name ? `<button type="button" class="ghost" id="aCancel">やめる</button>` : ""}`;
       return;
     }
-    $("aNow").innerHTML = `<span class="label">ログイン中</span><b><span class="nt">${esc(me.name)}</span></b><span class="hint">${esc(authUser.email || "")}</span>`;
+    $("aNow").innerHTML = `<span class="label">PLAYER</span><b><span class="nt">${esc(me.name)}</span></b><span class="hint">${esc(authUser.email || "")}</span>`;
     $("aForm").innerHTML = `<button type="button" class="ghost primaryish" id="aMine">自分の戦績を見る</button><button type="button" class="ghost" id="aRename">名前を変える</button><button type="button" class="ghost" id="aOut">ログアウト</button>`;
   }
   $("acct").addEventListener("click", async e => {
@@ -2481,8 +2546,8 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   });
   $("gInvite").addEventListener("click", async () => {
     const url = location.origin + location.pathname + "#" + group.id;
-    try { await navigator.clipboard.writeText(url); $("gHint").textContent = "招待リンクをコピーしました。友達に送ると、開くだけでこのグループに入れます: " + url; }
-    catch (e) { $("gHint").textContent = "このリンクを友達に送ってください: " + url; }
+    try { await navigator.clipboard.writeText(url); $("gHint").textContent = "招待リンクをコピーしました。仲間に送れば、開くだけでスクワッドに入れます: " + url; }
+    catch (e) { $("gHint").textContent = "このリンクを仲間に送ってください: " + url; }
   });
   async function startAuth() {
     try {
