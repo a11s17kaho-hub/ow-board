@@ -7,44 +7,60 @@
 <meta name="robots" content="noindex">
 <title>OW戦績ボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,600;1,700;1,800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>
 /* Layout: 試合を記録するフォームを左に、要約・メンバー・ヒーロー・マップを右に積む2カラム。狭い画面では1カラム */
 :root {
-  --bg: #f3f4f7;
+  --bg: #edf0f5;
+  --bg-glow: rgba(232, 135, 14, .10);
+  --bg-line: rgba(23, 32, 51, .045);
   --surface: #ffffff;
-  --line: #dde1e8;
-  --fg: #1d2330;
-  --muted: #5f6878;
+  --surface-2: #f6f7fa;
+  --line: #d9dee7;
+  --fg: #172033;
+  --muted: #5a6476;
   --accent: #e8870e;
+  --accent-2: #ffb547;
   --accent-ink: #ffffff;
   --win: #1f8fd6;
   --loss: #d64545;
   --draw: #8a93a3;
-  --grid: #e7eaf0;
-  --chip: #eef0f4;
+  --grid: #e5e9f0;
+  --chip: #edf0f5;
   --tank: #4f6fd0;
   --damage: #c2486f;
   --support: #2f9a6c;
   --s1: #e8870e; --s2: #1f8fd6; --s3: #c2486f; --s4: #2f9a6c; --s5: #7c5cc4; --s6: #6b7280;
+  --band: #141c2e;
+  --band-2: #22304d;
+  --band-fg: #f3f5fa;
+  --band-muted: #a9b3c6;
+  --band-line: rgba(255, 255, 255, .14);
+  --shadow: 0 1px 2px rgba(20, 28, 46, .06), 0 8px 24px -12px rgba(20, 28, 46, .18);
   --font-display: "Barlow Condensed", "Noto Sans JP", system-ui, sans-serif;
   --font-body: "Noto Sans JP", system-ui, -apple-system, "Hiragino Sans", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #141821; --surface: #1c2230; --line: #2c3446; --fg: #e9ecf2; --muted: #9aa3b4;
-    --accent: #f79a24; --accent-ink: #1a1206; --win: #4fb0ee; --loss: #ef6464; --draw: #8790a1;
-    --grid: #262d3c; --chip: #252c3b; --tank: #7f9af0; --damage: #ec7499; --support: #4fc493;
+    --bg: #0e131d; --bg-glow: rgba(247, 154, 36, .09); --bg-line: rgba(255, 255, 255, .03);
+    --surface: #171e2b; --surface-2: #1c2433; --line: #2a3345; --fg: #e9ecf2; --muted: #9aa3b4;
+    --accent: #f79a24; --accent-2: #ffbf5e; --accent-ink: #1a1206; --win: #4fb0ee; --loss: #ef6464; --draw: #8790a1;
+    --grid: #252d3c; --chip: #212938; --tank: #7f9af0; --damage: #ec7499; --support: #4fc493;
     --s1: #f79a24; --s2: #4fb0ee; --s3: #ec7499; --s4: #4fc493; --s5: #a98cf0; --s6: #a3abba;
+    --band: #182238; --band-2: #24345a; --band-fg: #f3f5fa; --band-muted: #a9b3c6; --band-line: rgba(255, 255, 255, .12);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -14px rgba(0, 0, 0, .7);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #141821; --surface: #1c2230; --line: #2c3446; --fg: #e9ecf2; --muted: #9aa3b4;
-  --accent: #f79a24; --accent-ink: #1a1206; --win: #4fb0ee; --loss: #ef6464; --draw: #8790a1;
-  --grid: #262d3c; --chip: #252c3b; --tank: #7f9af0; --damage: #ec7499; --support: #4fc493;
-  --s1: #f79a24; --s2: #4fb0ee; --s3: #ec7499; --s4: #4fc493; --s5: #a98cf0; --s6: #a3abba;
-  color-scheme: dark;
+    --bg: #0e131d; --bg-glow: rgba(247, 154, 36, .09); --bg-line: rgba(255, 255, 255, .03);
+    --surface: #171e2b; --surface-2: #1c2433; --line: #2a3345; --fg: #e9ecf2; --muted: #9aa3b4;
+    --accent: #f79a24; --accent-2: #ffbf5e; --accent-ink: #1a1206; --win: #4fb0ee; --loss: #ef6464; --draw: #8790a1;
+    --grid: #252d3c; --chip: #212938; --tank: #7f9af0; --damage: #ec7499; --support: #4fc493;
+    --s1: #f79a24; --s2: #4fb0ee; --s3: #ec7499; --s4: #4fc493; --s5: #a98cf0; --s6: #a3abba;
+    --band: #182238; --band-2: #24345a; --band-fg: #f3f5fa; --band-muted: #a9b3c6; --band-line: rgba(255, 255, 255, .12);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -14px rgba(0, 0, 0, .7);
+    color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
@@ -327,13 +343,122 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
 .echip button { font: inherit; border: none; background: none; color: var(--muted); cursor: pointer; padding: 0 4px; }
 .mini { display: inline-flex; gap: 2px; vertical-align: middle; }
 .mini svg { width: 18px; height: 18px; display: block; }
+
+/* ===== v16 見た目: ゲームのロビー風。濃紺の帯 + オレンジの斜めライン ===== */
+body {
+  background:
+    radial-gradient(900px 420px at 85% -120px, var(--bg-glow), transparent 70%),
+    repeating-linear-gradient(120deg, transparent 0 22px, var(--bg-line) 22px 23px),
+    var(--bg);
+  background-attachment: fixed;
+}
+.topbar {
+  position: relative; overflow: hidden; isolation: isolate;
+  background: linear-gradient(115deg, var(--band) 0%, var(--band) 52%, var(--band-2) 100%);
+  color: var(--band-fg); border-radius: 14px; padding: 26px 24px 24px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "text lang" "text art"; gap: 12px 20px; align-items: start;
+  box-shadow: var(--shadow);
+}
+.topbar::before {
+  content: ""; position: absolute; z-index: -1; left: -40px; bottom: -1px; width: 62%; height: 6px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)); transform: skewX(-30deg); transform-origin: left;
+}
+.topbar::after {
+  content: ""; position: absolute; z-index: -1; right: -60px; top: -40px; width: 340px; height: 260px;
+  background: repeating-linear-gradient(115deg, transparent 0 14px, var(--band-line) 14px 16px);
+  -webkit-mask-image: linear-gradient(200deg, #000 20%, transparent 75%); mask-image: linear-gradient(200deg, #000 20%, transparent 75%);
+}
+.tb-text { grid-area: text; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.eyebrow { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: 13px; letter-spacing: .18em; color: var(--accent-2); }
+.topbar h1 { font-style: italic; font-weight: 800; font-size: clamp(38px, 7vw, 60px); letter-spacing: .01em; line-height: .95; text-transform: uppercase; text-wrap: balance; }
+.topbar h1 span { color: var(--accent); padding: 0 .06em; }
+.topbar .sub { color: var(--band-muted); max-width: 36em; margin: 4px 0 0; }
+.topbar .lang { grid-area: lang; justify-self: end; }
+.topbar .lang button { background: transparent; color: var(--band-fg); border-color: var(--band-line); }
+.topbar .lang button[aria-pressed="true"] { background: var(--band-fg); color: var(--band); border-color: var(--band-fg); }
+.tb-art { grid-area: art; display: flex; justify-self: end; align-self: end; padding-right: 6px; }
+.tb-art img {
+  width: 58px; height: 74px; object-fit: cover; display: block; margin-left: -6px;
+  clip-path: polygon(22% 0, 100% 0, 78% 100%, 0 100%); background: var(--band-2);
+  filter: saturate(1.05); transition: transform .2s ease;
+}
+.tb-art img:hover { transform: translateY(-4px); }
+@media (max-width: 640px) {
+  .topbar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "lang" "text" "art"; padding: 18px 16px 20px; }
+  .topbar .lang { justify-self: start; }
+  .tb-art { justify-self: start; }
+  .tb-art img { width: 46px; height: 58px; }
+}
+
+.status { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; box-shadow: var(--shadow); }
+.status.sample { border: 1px dashed var(--accent); border-left: 4px solid var(--accent); }
+
+.panel { border-radius: 12px; box-shadow: var(--shadow); padding: 18px; position: relative; }
+h2 {
+  font-style: italic; font-weight: 700; font-size: 22px; letter-spacing: .03em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px; text-wrap: balance;
+}
+h2::before { content: ""; flex: none; width: 6px; height: 1.05em; background: linear-gradient(var(--accent-2), var(--accent)); transform: skewX(-16deg); border-radius: 1px; }
+.label { text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+
+.modetabs { gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 5px; box-shadow: var(--shadow); align-self: flex-start; }
+.modetabs button {
+  font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 19px; letter-spacing: .05em; text-transform: uppercase;
+  border: none; background: transparent; color: var(--muted); border-radius: 0; padding: 8px 26px;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.modetabs button:hover { color: var(--fg); }
+.modetabs button[aria-pressed="true"] { background: linear-gradient(100deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
+
+.primary {
+  font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 20px; letter-spacing: .08em; text-transform: uppercase;
+  background: linear-gradient(100deg, var(--accent), var(--accent-2)); border-radius: 0; padding: 12px;
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition: filter .15s ease, transform .15s ease;
+}
+.primary:not(:disabled):hover { filter: brightness(1.06); transform: translateY(-1px); }
+.seg button.big { font-style: italic; border-radius: 0; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.groupbar { border-left: 4px solid var(--accent); }
+
+/* 1v1: スコアボード風 */
+.duelers { background: var(--band); color: var(--band-fg); border-radius: 12px; padding: 14px 12px; gap: 10px; }
+.duelers .label { color: var(--band-muted); }
+.duelers input[type="text"] { background: rgba(255, 255, 255, .06); color: var(--band-fg); border-color: var(--band-line); }
+.duelers .known button { color: var(--band-muted); border-color: var(--band-line); }
+.duelers .dknown button[aria-pressed="true"] { color: var(--band-fg); border-color: var(--accent); }
+.duelers .vs { color: var(--accent); font-style: italic; font-size: 26px; }
+.dside { position: relative; }
+.score { background: rgba(0, 0, 0, .22); border-radius: 10px; padding: 6px; gap: 4px; min-width: 0; }
+.score input { color: var(--band-fg); font-size: 36px; font-style: italic; flex: 1 1 auto; width: 0; min-width: 1.4em; }
+.score button { background: rgba(255, 255, 255, .08); border-color: var(--band-line); color: var(--band-fg); font-family: var(--font-display); font-weight: 700; font-size: 15px; width: 34px; height: 34px; padding: 0; }
+.dside.lead .score input { color: var(--accent-2); }
+.dwin {
+  display: none; align-self: center; font-family: var(--font-display); font-style: italic; font-weight: 800; font-size: 14px; letter-spacing: .14em;
+  color: var(--accent-ink); background: linear-gradient(100deg, var(--accent), var(--accent-2)); padding: 1px 14px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+.dside.done .dwin { display: block; }
+.duelers .herobtn { background: rgba(255, 255, 255, .06); color: var(--band-fg); border-color: var(--band-line); }
+
+.lbrow { background: var(--surface-2); }
+.lbrow.head { background: none; }
+.lbrow.p1 { background: linear-gradient(90deg, rgba(212, 164, 32, .14), var(--surface-2) 60%); }
+.lbrow .pos { font-style: italic; }
+.kpi .v, .mcard .wr, .rival .big, td .sc, .lbtop .best .v { font-style: italic; }
+.mapcard, .mcard, .card, .pair { background: var(--surface-2); transition: border-color .15s ease, transform .15s ease; }
+.mapcard:hover, .mcard:hover { border-color: var(--accent); }
+.mapcard .art img, .mapcard .art svg { transition: transform .3s ease; }
+.mapcard:hover .art svg { transform: scale(1.04); }
+th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
+@media (prefers-reduced-motion: reduce) { .tb-art img, .primary, .mapcard .art svg { transition: none; } }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header class="topbar">
-    <div>
+    <div class="tb-text">
+      <span class="eyebrow">OVERWATCH 2 · FRIENDS LEAGUE</span>
       <h1>OW<span>戦績</span>ボード</h1>
       <p class="sub">みんなで試合結果を記録して、勝率・ランク・ヒーロー・マップの成績をいっしょに見るページ</p>
     </div>
@@ -341,6 +466,9 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
       <button type="button" data-lang="ja" aria-pressed="false">日本語</button>
       <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
       <button type="button" data-lang="en" aria-pressed="false">English</button>
+    </div>
+    <div class="tb-art" aria-hidden="true">
+      <img src="heroes/Tracer.jpg" alt="" onerror="this.remove()"><img src="heroes/Reinhardt.jpg" alt="" onerror="this.remove()"><img src="heroes/Kiriko.jpg" alt="" onerror="this.remove()"><img src="heroes/Genji.jpg" alt="" onerror="this.remove()"><img src="heroes/Mercy.jpg" alt="" onerror="this.remove()">
     </div>
   </header>
 
@@ -534,7 +662,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
             <input type="text" id="d0Name" list="nameList" maxlength="24" placeholder="名前" class="nt">
             <div class="known dknown" id="d0Known"></div>
             <button type="button" class="herobtn" id="d0Hero"></button>
-            <div class="score"><button type="button" data-sc="0" data-d="-1" aria-label="プレイヤー1のスコアを減らす">−</button><input type="number" id="d0Score" min="0" max="99" inputmode="numeric" value="0" aria-label="プレイヤー1のスコア"><button type="button" data-sc="0" data-d="1" aria-label="プレイヤー1のスコアを増やす">＋</button></div>
+            <div class="score"><button type="button" data-sc="0" data-d="-1" aria-label="プレイヤー1のスコアを3減らす">−3</button><input type="number" id="d0Score" min="0" max="51" step="3" inputmode="numeric" value="0" aria-label="プレイヤー1のスコア"><button type="button" data-sc="0" data-d="1" aria-label="プレイヤー1のスコアを3増やす">＋3</button></div><span class="dwin" aria-hidden="true">WIN</span>
           </div>
           <div class="vs">VS</div>
           <div class="dside" id="dSide1">
@@ -542,7 +670,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
             <input type="text" id="d1Name" list="nameList" maxlength="24" placeholder="名前" class="nt">
             <div class="known dknown" id="d1Known"></div>
             <button type="button" class="herobtn" id="d1Hero"></button>
-            <div class="score"><button type="button" data-sc="1" data-d="-1" aria-label="プレイヤー2のスコアを減らす">−</button><input type="number" id="d1Score" min="0" max="99" inputmode="numeric" value="0" aria-label="プレイヤー2のスコア"><button type="button" data-sc="1" data-d="1" aria-label="プレイヤー2のスコアを増やす">＋</button></div>
+            <div class="score"><button type="button" data-sc="1" data-d="-1" aria-label="プレイヤー2のスコアを3減らす">−3</button><input type="number" id="d1Score" min="0" max="51" step="3" inputmode="numeric" value="0" aria-label="プレイヤー2のスコア"><button type="button" data-sc="1" data-d="1" aria-label="プレイヤー2のスコアを3増やす">＋3</button></div><span class="dwin" aria-hidden="true">WIN</span>
           </div>
         </div>
         <div class="field"><span class="label">マップ</span><div class="mapbtn fixed" id="dMapBtn"></div></div>
@@ -560,7 +688,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
           <div class="tools"><label class="f dtools" hidden><span class="label">ルール</span><select id="dRuleF"><option value="">すべて</option><option value="arena">1v1 Arena</option><option value="mystery">ミステリー</option><option value="limited">リミテッド</option><option value="free">自由に選ぶ</option></select></label><label class="f dtools"><span class="label">期間</span><select id="dRange"><option value="all">全期間</option><option value="7">直近7日</option><option value="30">直近30日</option><option value="90">直近90日</option></select></label></div>
         </div>
         <div class="lb" id="dLb"></div>
-        <p class="hint">勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。キル差は、取ったキル(ポイント)から取られた数を引いたものです。</p>
+        <p class="hint">勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。ポイント差は、取ったポイントから取られたポイントを引いたものです(1キル=3ポイント)。</p>
       </section>
 
       <section class="panel" aria-labelledby="h-dvs">
@@ -633,6 +761,10 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   MAPS.forEach(([t, ms]) => ms.forEach(m => MAP_TYPE[m] = t));
   // カスタムゲームの1v1で選べるマップ(エリミネーション/デスマッチ用のアリーナと、ワークショップ用の空間)
   const ARENA_MAP = "Lijiang Tower: Control Center";
+  // 1v1 Arena は 1キル=3ポイント。50を超えた時点(51 = 17キル)で終わる
+  const ARENA_END = 51;
+  const snap3 = v => Math.max(0, Math.min(ARENA_END, Math.round((+v || 0) / 3) * 3));
+  function capOther(i) { if (dform.s[i] >= ARENA_END) dform.s[1 - i] = Math.min(dform.s[1 - i], ARENA_END - 3); }
   const DUEL_MAPS = [
     ["ワークショップ「1v1 Arena」", [ARENA_MAP]],
     ["ミステリー・リミテッドデュエル", ["Castillo", "Ecopoint: Antarctica", "Necropolis"]],
@@ -1510,7 +1642,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   const dform = { p: [{ name: "", hero: "" }, { name: "", hero: "" }], s: [0, 0], map: "", rule: "mystery" };
   const RULES = { arena: "1v1 Arena", mystery: "ミステリー", limited: "リミテッド", free: "自由に選ぶ" };
   const RULE_HINT = {
-    arena: "ワークショップ「1v1 Arena」(コード TXCXX):マップは Lijiang Tower のコントロールセンター。倒されるたびにヒーローがランダムで変わり、先に50ポイント(約17キル)取ったほうの勝ち。スコアにはポイントかキル数を入れてください。",
+    arena: "ワークショップ「1v1 Arena」(コード TXCXX):マップは Lijiang Tower のコントロールセンター。倒されるたびにヒーローがランダムで変わります。1キル=3ポイントで、50ポイントを超えた瞬間(17キル=51ポイント)に勝敗が決まります。スコアは3ずつ増減します。",
     mystery: "1v1 ミステリーデュエル:毎ラウンド、2人とも同じヒーローがランダムで決まります。先に5本取ったほうの勝ち。ヒーローは選ばなくてOKです。",
     limited: "1v1 リミテッドデュエル:毎ラウンド、同じ3体の中から選びます。先に5本取ったほうの勝ち。よく使ったヒーローを選んでおくと、ヒーロー別の成績に残ります(任意)。",
     free: "好きなヒーローどうしで勝負します。使ったヒーローを選んでおくと、ヒーロー別やライバル対決の組み合わせに残ります。",
@@ -1523,7 +1655,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     for (let i = 0; i < 26; i++) {
       const a = Math.floor(r() * 4); let b = Math.floor(r() * 3); if (b >= a) b++;
       const pa = skill[a] / (skill[a] + skill[b]); let s1 = 0, s2 = 0;
-      while (s1 < 17 && s2 < 17) { if (r() < pa) s1++; else s2++; }
+      while (s1 < ARENA_END && s2 < ARENA_END) { if (r() < pa) s1 += 3; else s2 += 3; }
       const d = new Date(); d.setDate(d.getDate() - Math.floor((26 - i) * .9));
       out.push({ id: "ds" + i, rule: "arena", p1: { name: names[a], hero: "" }, p2: { name: names[b], hero: "" }, s1, s2, map: ARENA_MAP, date: isoDay(d), note: "", createdAt: i });
     }
@@ -1582,6 +1714,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
       $(`d${i}Hero`).innerHTML = p.hero ? `${heroEmblem(p.hero, HERO_ROLE[p.hero])}<span>${esc(p.hero)}</span>` : `<span class="ph">ヒーローを選ぶ</span>`;
       if (document.activeElement !== $(`d${i}Score`)) $(`d${i}Score`).value = dform.s[i];
       $(`dSide${i}`).classList.toggle("lead", dform.s[i] > dform.s[1 - i]);
+      $(`dSide${i}`).classList.toggle("done", dform.s[i] >= ARENA_END);
     });
     updateDSubmit();
   }
@@ -1630,13 +1763,13 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
   });
   $("dform").addEventListener("click", e => {
     const b = e.target.closest("[data-sc]"); if (!b) return;
-    const i = +b.dataset.sc; dform.s[i] = Math.max(0, Math.min(99, dform.s[i] + +b.dataset.d)); renderDForm();
+    const i = +b.dataset.sc; dform.s[i] = snap3(dform.s[i] + 3 * b.dataset.d); capOther(i); renderDForm();
   });
   // 1v1 は 1v1 Arena(マップ固定)だけにしたので、マップは選ばない
   [0, 1].forEach(i => {
     const el = $(`d${i}Score`);
-    el.addEventListener("input", () => { const v = parseInt(el.value, 10); dform.s[i] = Number.isFinite(v) ? Math.max(0, Math.min(99, v)) : 0; renderDForm(); });
-    el.addEventListener("blur", () => { el.value = dform.s[i]; });
+    el.addEventListener("input", () => { const v = parseInt(el.value, 10); dform.s[i] = Number.isFinite(v) ? Math.max(0, Math.min(ARENA_END, v)) : 0; renderDForm(); });
+    el.addEventListener("blur", () => { dform.s[i] = snap3(dform.s[i]); capOther(i); renderDForm(); el.value = dform.s[i]; });
     el.addEventListener("focus", () => el.select());
   });
   $("dDate").value = today();
@@ -1649,7 +1782,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     if (!dcol || !a || !b) return;
     if (a === b) { $("dToast").textContent = "同じ名前どうしは記録できません"; return; }
     const myst = dform.rule === "mystery" || dform.rule === "arena";
-    const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: dform.s[0], s2: dform.s[1], map: dform.map, date: $("dDate").value || today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now() };
+    const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: snap3(dform.s[0]), s2: snap3(dform.s[1]), map: dform.map, date: $("dDate").value || today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now() };
     $("dSubmit").disabled = true;
     try {
       await dcol.add(doc);
@@ -1686,7 +1819,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
       <span class="c">${p.t.win}-${p.t.loss}${p.t.draw ? "-" + p.t.draw : ""}</span>
       <span class="c opt ${p.t.rf - p.t.ra > 0 ? "up" : p.t.rf - p.t.ra < 0 ? "down" : ""}">${sd(p.t.rf - p.t.ra)}</span>
       <span class="c opt">${p.t.n}</span></div>`;
-    $("dLb").innerHTML = ps.length ? `<div class="lbrow head"><span></span><span>プレイヤー</span><span class="c">勝率</span><span class="c">勝-敗</span><span class="c opt">キル差</span><span class="c opt">試合数</span></div>`
+    $("dLb").innerHTML = ps.length ? `<div class="lbrow head"><span></span><span>プレイヤー</span><span class="c">勝率</span><span class="c">勝-敗</span><span class="c opt">ポイント差</span><span class="c opt">試合数</span></div>`
       + ok.map((p, i) => row(p, i, false)).join("") + few.map(p => row(p, 0, true)).join("")
       : `<div class="empty">1v1を記録すると、ここに順位が出ます。</div>`;
   }
@@ -1725,7 +1858,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     const recent = vs.slice(-12).reverse();
     $("dRival").innerHTML = `<div class="rival">
         <div class="rv"><span class="nt">${esc(a)}</span><span class="big${t.win > t.loss ? " lead" : ""}">${t.win}</span></div>
-        <div class="mid">${t.n}回対戦${t.draw ? `・引き分け${t.draw}` : ""}<br>キル ${t.rf}-${t.ra}</div>
+        <div class="mid">${t.n}回対戦${t.draw ? `・引き分け${t.draw}` : ""}<br>ポイント ${t.rf}-${t.ra}</div>
         <div class="rv r"><span class="big${t.loss > t.win ? " lead" : ""}">${t.loss}</span><span class="nt">${esc(b)}</span></div>
       </div>
       ${wlBar(t)}
@@ -1956,7 +2089,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["好きなヒーローどうしで勝負します。使ったヒーローを選んでおくと、ヒーロー別やライバル対決の組み合わせに残ります。", "Any heroes you like. Pick the heroes used to track hero stats and matchups.", "원하는 영웅끼리 승부합니다. 사용한 영웅을 고르면 영웅별 성적과 대결 조합에 남습니다."],
     ["ワークショップ「1v1 Arena」", "Workshop \"1v1 Arena\"", "워크샵 \"1v1 Arena\""],
     ["プレイヤー1のスコア", "Player 1 score", "플레이어 1 점수"], ["プレイヤー2のスコア", "Player 2 score", "플레이어 2 점수"],
-    ["ワークショップ「1v1 Arena」(コード TXCXX):マップは Lijiang Tower のコントロールセンター。倒されるたびにヒーローがランダムで変わり、先に50ポイント(約17キル)取ったほうの勝ち。スコアにはポイントかキル数を入れてください。", "Workshop \"1v1 Arena\" (code TXCXX): played on Lijiang Tower's Control Center. Your hero changes randomly each time you die; first to 50 points (about 17 kills) wins. Enter points or kills as the score.", "워크샵 \"1v1 Arena\"(코드 TXCXX): 리장 타워 관제 센터에서 진행합니다. 죽을 때마다 영웅이 무작위로 바뀌고, 먼저 50포인트(약 17킬)를 얻으면 승리. 점수에는 포인트나 킬 수를 입력하세요."],
+    ["ワークショップ「1v1 Arena」(コード TXCXX):マップは Lijiang Tower のコントロールセンター。倒されるたびにヒーローがランダムで変わります。1キル=3ポイントで、50ポイントを超えた瞬間(17キル=51ポイント)に勝敗が決まります。スコアは3ずつ増減します。", "Workshop \"1v1 Arena\" (code TXCXX): played on Lijiang Tower's Control Center. Your hero changes randomly each time you die. 1 kill = 3 points, and the match ends the moment someone passes 50 (17 kills = 51 points). Scores go up and down in steps of 3.", "워크샵 \"1v1 Arena\"(코드 TXCXX): 리장 타워 관제 센터에서 진행합니다. 죽을 때마다 영웅이 무작위로 바뀝니다. 1킬=3포인트이며, 50포인트를 넘는 순간(17킬=51포인트) 승패가 결정됩니다. 점수는 3씩 오르내립니다."],
     // 1v1
     ["表示の切り替え", "Switch view", "보기 전환"],
     ["チーム戦", "Team", "팀전"],
@@ -1977,7 +2110,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["選ぶ", "Pick", "선택"],
     ["例: 最後に逆転した", "e.g. Comeback at the end", "예: 마지막에 역전"],
     ["1v1ランキング", "1v1 Ranking", "1v1 랭킹"],
-    ["勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。キル差は、取ったキル(ポイント)から取られた数を引いたものです。", "Win rate excludes draws. Players with fewer than 3 games are shown faded at the bottom. Kill diff = kills (points) scored minus conceded.", "승률은 무승부를 빼고 계산합니다. 3전 미만인 사람은 아래에 흐리게 표시합니다. 킬 차는 얻은 킬(포인트)에서 내준 수를 뺀 값입니다."],
+    ["勝率は引き分けを除いて計算します。3戦未満の人は下に薄く表示します。ポイント差は、取ったポイントから取られたポイントを引いたものです(1キル=3ポイント)。", "Win rate excludes draws. Players with fewer than 3 games are shown faded at the bottom. Point diff = points scored minus points conceded (1 kill = 3 points).", "승률은 무승부를 빼고 계산합니다. 3전 미만인 사람은 아래에 흐리게 표시합니다. 포인트 차는 얻은 포인트에서 내준 포인트를 뺀 값입니다(1킬=3포인트)."],
     ["対戦表(だれに強いか)", "Head-to-head (who beats whom)", "상대 전적표(누구에게 강한가)"],
     ["行のプレイヤーから見た勝ち-負けです。青は勝ち越し、赤は負け越し。", "Wins–losses from the row player's side. Blue = winning record, red = losing record.", "행 플레이어 기준 승-패입니다. 파랑은 우세, 빨강은 열세."],
     ["ライバル対決", "Rivalry", "라이벌 대결"],
@@ -1985,7 +2118,7 @@ td .sc { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     ["1v1の記録", "1v1 history", "1v1 기록"],
     ["スコア", "Score", "점수"],
     ["勝-敗", "W-L", "승-패"],
-    ["キル差", "Kill diff", "킬 차"],
+    ["キル差", "Kill diff", "킬 차"], ["ポイント差", "Point diff", "포인트 차"], ["ポイント", "Points", "포인트"],
     ["連勝中", "-win streak", "연승 중"],
     ["連敗中", "-loss streak", "연패 중"],
     ["1v1を記録すると、ここに順位が出ます。", "Log a 1v1 to see the standings here.", "1v1을 기록하면 여기에 순위가 나옵니다."],
