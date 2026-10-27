@@ -2524,9 +2524,15 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   $("acct").addEventListener("click", async e => {
     const id = e.target.closest("button") && e.target.closest("button").id;
     if (id === "aIn") {
-      const pv = new firebase.auth.GoogleAuthProvider();
-      try { await auth.signInWithPopup(pv); }
-      catch (err) { if (err && /popup/.test(err.code || "")) { try { await auth.signInWithRedirect(pv); } catch (e2) {} } else { $("aNow").querySelector(".hint").textContent = "ログインできませんでした(" + (err && err.code || "エラー") + ")。もう一度押してください。"; } }
+      const pv = new firebase.auth.GoogleAuthProvider(); pv.setCustomParameters({ prompt: "select_account" });
+      const showErr = err => { const h = $("aNow").querySelector(".hint"); if (h) h.textContent = "ログインできませんでした(" + (err && err.code || "エラー") + ")。もう一度押してください。"; };
+      // スマホはページごと切り替える方式、PCは小さな窓で開く方式
+      const mobile = window.matchMedia("(pointer: coarse)").matches;
+      try { if (mobile) await auth.signInWithRedirect(pv); else await auth.signInWithPopup(pv); }
+      catch (err) {
+        if (err && /popup-blocked|operation-not-supported/.test(err.code || "")) { try { await auth.signInWithRedirect(pv); } catch (e2) { showErr(e2); } }
+        else if (!(err && /popup-closed|cancelled-popup/.test(err.code || ""))) showErr(err);
+      }
     } else if (id === "aOut") { await auth.signOut(); }
     else if (id === "aRename") { nameEditing = true; renderAcct(); $("aName").focus(); }
     else if (id === "aCancel") { nameEditing = false; renderAcct(); }
@@ -2555,6 +2561,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       auth = firebase.auth();
     } catch (e) { auth = null; return; }
     renderAcct();
+    auth.getRedirectResult().catch(err => { const h = $("aNow").querySelector(".hint"); if (h) h.textContent = "ログインできませんでした(" + (err && err.code || "エラー") + ")。もう一度押してください。"; });
     auth.onAuthStateChanged(async u => {
       authUser = u; me = null; nameEditing = false;
       if (u) {
@@ -2588,7 +2595,10 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       const v = "10.14.1";
       await loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-app-compat.js`);
       await loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore-compat.js`);
-      if (!firebase.apps.length) firebase.initializeApp(window.OW_FIREBASE);
+      // ログイン画面をサイトと同じアドレスで開く(別アドレスだとブラウザに止められて真っ白になることがある)
+      const cfg = { ...window.OW_FIREBASE };
+      if (/\.(web\.app|firebaseapp\.com)$/.test(location.hostname)) cfg.authDomain = location.host;
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
       return firebase.firestore();
     } catch (e) { return null; }
   }
