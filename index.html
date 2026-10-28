@@ -18,7 +18,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="theme-color" content="#141c2e">
+<meta name="theme-color" content="#0b0d12">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,56 +30,36 @@
 <style>
 /* Layout: 試合を記録するフォームを左に、要約・メンバー・ヒーロー・マップを右に積む2カラム。狭い画面では1カラム */
 :root {
-  --bg: #edf0f5;
-  --bg-glow: rgba(232, 135, 14, .10);
-  --bg-line: rgba(23, 32, 51, .045);
-  --surface: #ffffff;
-  --surface-2: #f6f7fa;
-  --line: #d9dee7;
-  --fg: #172033;
-  --muted: #5a6476;
-  --accent: #e8870e;
-  --accent-2: #ffb547;
-  --accent-ink: #ffffff;
-  --win: #1f8fd6;
-  --loss: #d64545;
-  --draw: #8a93a3;
-  --grid: #e5e9f0;
-  --chip: #edf0f5;
-  --tank: #4f6fd0;
-  --damage: #c2486f;
-  --support: #2f9a6c;
-  --s1: #e8870e; --s2: #1f8fd6; --s3: #c2486f; --s4: #2f9a6c; --s5: #7c5cc4; --s6: #6b7280;
-  --band: #141c2e;
-  --band-2: #22304d;
+  /* ひとつの暗いテーマに統一:ほぼ黒の地にオレンジのアクセント */
+  --bg: #0b0d12;
+  --bg-glow: rgba(247, 154, 36, .08);
+  --bg-line: rgba(255, 255, 255, .025);
+  --surface: #141821;
+  --surface-2: #1a1f2a;
+  --line: #262c39;
+  --fg: #eceef3;
+  --muted: #959cab;
+  --accent: #f79a24;
+  --accent-2: #ffbf5e;
+  --accent-ink: #1a1206;
+  --win: #4fb0ee;
+  --loss: #ef6464;
+  --draw: #8790a1;
+  --grid: #222835;
+  --chip: #1e2430;
+  --tank: #7f9af0;
+  --damage: #ec7499;
+  --support: #4fc493;
+  --s1: #f79a24; --s2: #4fb0ee; --s3: #ec7499; --s4: #4fc493; --s5: #a98cf0; --s6: #a3abba;
+  --band: #12161f;
+  --band-2: #1c2230;
   --band-fg: #f3f5fa;
-  --band-muted: #a9b3c6;
-  --band-line: rgba(255, 255, 255, .14);
-  --shadow: 0 1px 2px rgba(20, 28, 46, .06), 0 8px 24px -12px rgba(20, 28, 46, .18);
+  --band-muted: #a3abba;
+  --band-line: rgba(255, 255, 255, .10);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 28px -14px rgba(0, 0, 0, .8);
   --font-display: "Barlow Condensed", "Noto Sans JP", system-ui, sans-serif;
   --font-body: "Noto Sans JP", system-ui, -apple-system, "Hiragino Sans", sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0e131d; --bg-glow: rgba(247, 154, 36, .09); --bg-line: rgba(255, 255, 255, .03);
-    --surface: #171e2b; --surface-2: #1c2433; --line: #2a3345; --fg: #e9ecf2; --muted: #9aa3b4;
-    --accent: #f79a24; --accent-2: #ffbf5e; --accent-ink: #1a1206; --win: #4fb0ee; --loss: #ef6464; --draw: #8790a1;
-    --grid: #252d3c; --chip: #212938; --tank: #7f9af0; --damage: #ec7499; --support: #4fc493;
-    --s1: #f79a24; --s2: #4fb0ee; --s3: #ec7499; --s4: #4fc493; --s5: #a98cf0; --s6: #a3abba;
-    --band: #182238; --band-2: #24345a; --band-fg: #f3f5fa; --band-muted: #a9b3c6; --band-line: rgba(255, 255, 255, .12);
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -14px rgba(0, 0, 0, .7);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-    --bg: #0e131d; --bg-glow: rgba(247, 154, 36, .09); --bg-line: rgba(255, 255, 255, .03);
-    --surface: #171e2b; --surface-2: #1c2433; --line: #2a3345; --fg: #e9ecf2; --muted: #9aa3b4;
-    --accent: #f79a24; --accent-2: #ffbf5e; --accent-ink: #1a1206; --win: #4fb0ee; --loss: #ef6464; --draw: #8790a1;
-    --grid: #252d3c; --chip: #212938; --tank: #7f9af0; --damage: #ec7499; --support: #4fc493;
-    --s1: #f79a24; --s2: #4fb0ee; --s3: #ec7499; --s4: #4fc493; --s5: #a98cf0; --s6: #a3abba;
-    --band: #182238; --band-2: #24345a; --band-fg: #f3f5fa; --band-muted: #a9b3c6; --band-line: rgba(255, 255, 255, .12);
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -14px rgba(0, 0, 0, .7);
-    color-scheme: dark;
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
@@ -117,6 +97,8 @@ form { display: flex; flex-direction: column; gap: 14px; }
 .seg2 { display: flex; flex-wrap: wrap; gap: 6px; }
 .seg2 button { padding: 6px 12px; font-weight: 500; }
 .seg2 button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.dateview { display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; color: var(--fg); font-variant-numeric: tabular-nums; }
+.dateview small { color: var(--muted); font-size: 11px; }
 select, input[type="text"], input[type="date"] { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
 .row2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 10px; }
 .members { display: flex; flex-direction: column; gap: 8px; }
@@ -509,6 +491,22 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
 .acctbar .aform input { width: 13em; }
 .gbtn { font: inherit; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 18px 8px 12px; cursor: pointer; box-shadow: var(--shadow); }
 .gbtn svg { width: 20px; height: 20px; display: block; }
+/* はじめて開いた人向け:ログイン前と名前を決める前は、アカウント欄を大きな案内にする */
+.acctbar.welcome { flex-direction: column; align-items: stretch; gap: 14px; border-left: 0; border-top: 4px solid var(--accent); padding-block: 22px; background: linear-gradient(160deg, var(--surface-2), var(--surface) 60%); }
+.acctbar.welcome .anow b { font-family: var(--font-display); font-size: 26px; letter-spacing: .02em; line-height: 1.2; }
+.acctbar.welcome .aform { justify-content: flex-start; }
+.acctbar.welcome .gbtn { font-size: 16px; padding: 12px 24px 12px 16px; background: #fff; color: #1f1f1f; border-color: #fff; }
+.acctbar.welcome .gbtn svg { width: 24px; height: 24px; }
+.acctbar.welcome .aform input { width: 16em; font-size: 16px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: flex; gap: 8px; align-items: flex-start; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--muted); font-size: 13px; line-height: 1.4; min-width: 0; }
+.steps li::before { content: counter(st); flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; background: var(--chip); color: var(--muted); }
+.steps li b { display: block; color: var(--fg); font-size: 14px; }
+.steps li.now { border-color: var(--accent); color: var(--fg); }
+.steps li.now::before { background: var(--accent); color: var(--accent-ink); }
+.steps li.done::before { content: "✓"; background: var(--win); color: #0b0d12; }
+.inapp { margin: 0; padding: 8px 12px; border-radius: 8px; background: rgba(239, 100, 100, .12); border: 1px solid var(--loss); font-size: 13px; }
+@media (max-width: 640px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .ghost.primaryish { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .mygroups { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .gchip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--chip); color: var(--fg); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
@@ -570,12 +568,15 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     </div>
   </header>
 
-  <div class="status" id="status">共有データに接続しています…</div>
-
     <section class="panel acctbar" id="acct" aria-label="アカウント" hidden>
       <div class="anow" id="aNow"><span class="label">PLAYER</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。</span></div>
       <div class="aform" id="aForm"></div>
+      <p class="inapp" id="aInapp" hidden>LINEなどのアプリの中で開いているとログインできません。右上のメニューから「ブラウザで開く」(Safari / Chrome)を選んでください。</p>
+      <ol class="steps" id="aSteps" hidden></ol>
     </section>
+
+    <div class="status" id="status">共有データに接続しています…</div>
+
 
     <section class="panel groupbar" aria-label="グループ">
       <div class="gnow"><span class="label">SQUAD</span><b id="gName">OPEN LOBBY</b><span class="hint" id="gHint"></span></div>
@@ -621,7 +622,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         </div>
         <div class="row2 maprow">
           <div class="field"><span class="label">マップ</span><select id="map" hidden></select><button type="button" class="mapbtn" id="mapBtn"></button></div>
-          <label class="field"><span class="label">日付</span><input type="date" id="date"></label>
+          <div class="field"><span class="label">日付</span><div class="dateview" id="date" aria-live="polite"></div></div>
         </div>
         <div class="field">
           <span class="label">参加メンバー・使ったヒーロー・ランク変動</span>
@@ -806,7 +807,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
           </div>
         </div>
         <div class="field"><span class="label">マップ</span><div class="mapbtn fixed" id="dMapBtn"></div></div>
-        <label class="field"><span class="label">日付</span><input type="date" id="dDate"></label>
+        <div class="field"><span class="label">日付</span><div class="dateview" id="dDate"></div></div>
         <label class="field"><span class="label">メモ(任意)</span><input type="text" id="dNote" maxlength="80" placeholder="例: 最後に逆転した"></label>
         <button class="primary" id="dSubmit" type="submit" disabled>記録する</button>
         <div class="toast" id="dToast" role="status"></div>
@@ -1072,6 +1073,13 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const isoDay = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const today = () => isoDay(new Date());
+  // 日付は入力させず、記録した日(ブラウザの今日)をそのまま使う
+  const IN_APP = /\bLine\/|FBAN|FBAV|Instagram|MicroMessenger|KAKAOTALK/i.test(navigator.userAgent);
+  const showToday = () => {
+    const t = new Date().toLocaleDateString("ja-JP", { month: "long", day: "numeric", weekday: "short" });
+    ["date", "dDate"].forEach(id => { const el = $(id); if (el) el.innerHTML = `${esc(t)} <small>今日・自動</small>`; });
+  };
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) showToday(); });
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const pid = name => "p_" + [...new TextEncoder().encode(name)].map(b => b.toString(16).padStart(2, "0")).join("");
@@ -1132,7 +1140,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   $("map").innerHTML = MAPS.map(([t, ms]) => `<optgroup label="${esc(t)}">${ms.map(m => `<option>${esc(m)}</option>`).join("")}</optgroup>`).join("");
   $("queueSeg").innerHTML = QUEUES.map(q => `<button type="button" data-v="${q}" aria-pressed="false">${q}</button>`).join("");
   $("fQueue").innerHTML = `<option value="">すべて</option>` + QUEUES.map(q => `<option>${q}</option>`).join("");
-  $("date").value = today();
+  showToday();
   try { const saved = JSON.parse(lsGet("ow-last-members") || "null"); if (Array.isArray(saved)) form.members = saved.filter(m => m && typeof m.name === "string").slice(0, 6).map(m => ({ name: m.name, hero: m.hero || "", role: m.role || "", dir: 1, amt: "" })); } catch (e) {}
   { const q = lsGet("ow-last-queue"); if (QUEUES.includes(q)) form.queue = q; }
 
@@ -1320,7 +1328,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     if (!col || !form.result) return;
     const ranked = form.queue === "ランク";
     const doc = {
-      result: form.result, map: $("map").value, queue: form.queue, date: $("date").value || today(),
+      result: form.result, map: $("map").value, queue: form.queue, date: today(),
       members: form.members.map(m => {
         const amt = parseInt(m.amt, 10);
         return { name: m.name, hero: (m.hero || "").slice(0, 24), role: m.role || HERO_ROLE[m.hero] || "", delta: ranked && amt > 0 ? m.dir * Math.min(amt, 100) : null };
@@ -2012,7 +2020,6 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     el.addEventListener("blur", () => { dform.s[i] = snap3(dform.s[i]); capOther(i); renderDForm(); el.value = dform.s[i]; });
     el.addEventListener("focus", () => el.select());
   });
-  $("dDate").value = today();
   try { const last = JSON.parse(lsGet("ow-duel-last") || "null"); if (Array.isArray(last)) last.slice(0, 2).forEach((p, i) => { if (p && typeof p.name === "string") { dform.p[i] = { name: p.name, hero: HERO_ROLE[p.hero] ? p.hero : "" }; $(`d${i}Name`).value = p.name; } }); } catch (e) {}
   setDMap(ARENA_MAP);
   renderDForm();
@@ -2022,7 +2029,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     if (!dcol || !a || !b) return;
     if (a === b) { $("dToast").textContent = "同じ名前どうしは記録できません"; return; }
     const myst = dform.rule === "mystery" || dform.rule === "arena";
-    const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: snap3(dform.s[0]), s2: snap3(dform.s[1]), map: dform.map, date: $("dDate").value || today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now() };
+    const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: snap3(dform.s[0]), s2: snap3(dform.s[1]), map: dform.map, date: today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now() };
     $("dSubmit").disabled = true;
     try {
       await dcol.add(doc);
@@ -2228,6 +2235,17 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     ["全体は、このサイトでログインして記録した人全員の順位です(ログインした本人が入っている試合だけ数えます)。", "Global ranks everyone who signed in and recorded on this site (only matches that include the signed-in player count).", "전체는 이 사이트에 로그인해 기록한 모든 사람의 순위입니다(로그인한 본인이 들어간 경기만 셉니다)."],
     ["アカウント", "Account", "계정"], ["ログインしていません", "Not signed in", "로그인하지 않음"], ["ログイン中", "Signed in", "로그인 중"], ["Googleでログイン", "Sign in with Google", "Google로 로그인"], ["ログアウト", "Sign out", "로그아웃"], ["名前を変える", "Change name", "이름 변경"], ["自分の戦績を見る", "My stats", "내 전적 보기"], ["決定", "OK", "확인"], ["やめる", "Cancel", "취소"],
     ["記録に使う名前を決めてください", "Choose the name you record with", "기록에 쓸 이름을 정하세요"], ["自分のグループ", "My groups", "내 그룹"], ["このグループを一覧から外す", "Remove this group from my list", "이 그룹을 목록에서 빼기"], ["招待リンクをコピー", "Copy invite link", "초대 링크 복사"],
+    ["まずはGoogleでログイン", "First, sign in with Google", "먼저 Google로 로그인"],
+    ["ログインすると、自分の名前で試合を記録でき、入ったスクワッドも覚えておけます。次からは開くだけでOKです。", "Sign in to log matches under your name and keep your squads. Next time, just open the page.", "로그인하면 내 이름으로 경기를 기록하고 스쿼드도 기억됩니다. 다음부터는 열기만 하면 됩니다."],
+    ["ボタンを押すだけ", "Just tap the button", "버튼만 누르면 끝"],
+    ["名前を決める", "Pick a name", "이름 정하기"],
+    ["記録に出る名前", "Shown on your records", "기록에 표시될 이름"],
+    ["スクワッドに入る", "Join a squad", "스쿼드 참가"],
+    ["招待リンクかコード", "Invite link or code", "초대 링크나 코드"],
+    ["結果を押して記録する", "Tap the result and save", "결과를 눌러 기록"],
+    ["あと少し", "Almost there", "거의 다 됐어요"],
+    ["今日・自動", "Today · auto", "오늘 · 자동"],
+    ["LINEなどのアプリの中で開いているとログインできません。右上のメニューから「ブラウザで開く」(Safari / Chrome)を選んでください。", "Sign-in doesn't work inside apps like LINE. Use the menu to open this page in Safari or Chrome.", "LINE 같은 앱 안에서는 로그인할 수 없어요. 메뉴에서 Safari / Chrome으로 열어 주세요."],
     ["ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。", "Sign in to record under your own name and keep your groups. Only signed-in people can add records.", "로그인하면 내 이름으로 기록하고 들어간 그룹을 기억합니다. 기록 추가는 로그인한 사람만 할 수 있습니다."],
     ["ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。", "This name appears in rankings and match records. Use the name you used before to keep your past records linked.", "랭킹과 경기 기록에 표시되는 이름입니다. 전에 쓰던 이름과 같게 하면 지금까지의 기록과 이어집니다."],
     ["記録に使う名前を決めると、記録を追加できます。", "Choose your name to start adding records.", "이름을 정하면 기록을 추가할 수 있습니다."],
@@ -2526,13 +2544,22 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     $("myGroups").hidden = !mg.length && !(me && group.id);
     $("myGroups").innerHTML = (mg.length ? `<span class="label">MY SQUADS</span>` + mg.map(g => `<button type="button" class="gchip nt" data-g="${esc(g)}">${esc(g)}</button>`).join("") : "")
       + (me && group.id ? `<button type="button" class="gchip out" data-gforget="${esc(group.name)}">一覧から外す</button>` : "");
+    const setup = !authUser || !me || !me.name;
+    box.classList.toggle("welcome", setup);
+    $("aSteps").hidden = !setup;
+    if (setup) {
+      const at = !authUser ? 0 : 1;
+      $("aSteps").innerHTML = [["Googleでログイン", "ボタンを押すだけ"], ["名前を決める", "記録に出る名前"], ["スクワッドに入る", "招待リンクかコード"], ["試合を記録", "結果を押して記録する"]]
+        .map(([t, d], i) => `<li class="${i < at ? "done" : i === at ? "now" : ""}"><span><b>${t}</b>${d}</span></li>`).join("");
+    }
+    $("aInapp").hidden = !(setup && !authUser && IN_APP);
     if (!authUser) {
-      $("aNow").innerHTML = `<span class="label">PLAYER</span><b>ログインしていません</b><span class="hint">ログインすると、自分の名前で記録でき、入ったグループも覚えておけます。記録の追加はログインした人だけができます。</span>`;
+      $("aNow").innerHTML = `<span class="label">WELCOME</span><b>まずはGoogleでログイン</b><span class="hint">ログインすると、自分の名前で試合を記録でき、入ったスクワッドも覚えておけます。次からは開くだけでOKです。</span>`;
       $("aForm").innerHTML = `<button type="button" class="gbtn" id="aIn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Googleでログイン</button>`;
       return;
     }
     if (!me || !me.name || nameEditing) {
-      $("aNow").innerHTML = `<span class="label">PLAYER</span><b>記録に使う名前を決めてください</b><span class="hint">ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。</span>`;
+      $("aNow").innerHTML = `<span class="label">${me && me.name ? "PLAYER" : "あと少し"}</span><b>記録に使う名前を決めてください</b><span class="hint">ランキングや試合の記録に出る名前です。前から使っていた名前があれば、同じ名前にすると今までの記録とつながります。</span>`;
       $("aForm").innerHTML = `<input type="text" id="aName" class="nt" maxlength="24" list="nameList" placeholder="名前" aria-label="記録に使う名前" value="${esc(myName() || (authUser.displayName || "").slice(0, 24))}"><button type="button" class="ghost primaryish" id="aSave">決定</button>${me && me.name ? `<button type="button" class="ghost" id="aCancel">やめる</button>` : ""}`;
       return;
     }
