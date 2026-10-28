@@ -1,6 +1,6 @@
 {
-  "name": "OWLIKER - OW戦績ボード",
-  "short_name": "OWLIKER",
+  "name": "OWログ - OWLIKER",
+  "short_name": "OWログ",
   "description": "仲間と試合を記録して、勝率・ランク・ヒーロー・マップ・1v1を見える化",
   "lang": "ja",
   "start_url": "/",

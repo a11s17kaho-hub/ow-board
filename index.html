@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- ===== サイトの名前・説明(ここを書き換えると、Google検索やLINEで共有したときの表示が変わります) ===== -->
-<title>OWLIKER｜オーバーウォッチの戦績を仲間と記録・ランキング</title>
-<meta name="description" content="オーバーウォッチの試合結果を仲間と記録して、勝率・ランク・ヒーロー・マップ・1v1の成績をランキングで見られる無料の戦績ボード。Googleでログインして、スクワッドの仲間だけで共有できます。">
-<meta property="og:title" content="OWLIKER - OW戦績ボード">
+<title>OWログ｜オーバーウォッチの戦績を仲間と記録・ランキング</title>
+<meta name="description" content="OWログは、オーバーウォッチの試合結果を仲間と記録して、勝率・ランク・ヒーロー・マップ・1v1の成績をランキングで見られる無料の戦績ボード。Googleでログインして、スクワッドの仲間だけで共有できます。">
+<meta property="og:title" content="OWログ">
 <meta property="og:description" content="仲間と試合を記録して、勝率・ランク・ヒーロー・マップ・1v1を見える化">
 <!-- ===== ここまで ===== -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://owliker.web.app/">
 <meta property="og:image" content="https://owliker.web.app/icons/og-image.png">
-<meta property="og:site_name" content="OWLIKER">
+<meta property="og:site_name" content="OWログ">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://owliker.web.app/">
 <link rel="manifest" href="manifest.json">
@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="OWLIKER">
+<meta name="apple-mobile-web-app-title" content="OWログ">
 <script src="firebase-config.js"></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -557,7 +557,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   <header class="topbar">
     <div class="tb-text">
       <span class="eyebrow">OWLIKER · FRIENDS LEAGUE</span>
-      <h1>OW<span>戦績</span>ボード</h1>
+      <h1>OW<span class="nt">ログ</span></h1>
       <p class="sub">みんなで試合結果を記録して、勝率・ランク・ヒーロー・マップの成績をいっしょに見るページ</p>
     </div>
     <div class="lang" id="langSeg" role="group" aria-label="Language">
@@ -2404,7 +2404,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     [/友達にも同じ合言葉「(.+)」を入れてもらうと、このグループの記録を一緒に見られます。/g, ["Have friends enter the same passphrase \"$1\" to share this group's records.", "친구에게도 같은 암호 \"$1\"를 입력하게 하면 이 그룹의 기록을 함께 볼 수 있습니다."]],
     [/相手チームのヒーローを選ぶ\((\d+)\/6\)/g, ["Pick enemy heroes ($1/6)", "상대 팀 영웅 선택($1/6)"]],
     [/味方のヒーローを選ぶ\((\d+)\/(\d+)\)/g, ["Pick ally heroes ($1/$2)", "아군 영웅 선택($1/$2)"]],
-    [/^コード「(.+)」の仲間だけの戦績ボード。招待リンクで仲間を呼べます。$/g, ["Squad \"$1\" — a board just for your crew. Bring friends in with the invite link.", "코드 \"$1\" 친구들만의 전적 보드. 초대 링크로 친구를 부르세요."]],
+    [/^コード「(.+)」の仲間だけのOWログ。招待リンクで仲間を呼べます。$/g, ["Squad \"$1\" — a board just for your crew. Bring friends in with the invite link.", "코드 \"$1\" 친구들만의 전적 보드. 초대 링크로 친구를 부르세요."]],
     [/まだ選ばれていません\(最大(\d+)体\)/g, ["None picked yet (up to $1)", "아직 선택하지 않음(최대 $1명)"]],
     [/^(.+)は勝率(\d+%)で、全体\((\d+%)\)より低めです。$/g, ["$1: $2 win rate, lower than overall ($3).", "$1 승률은 $2로 전체($3)보다 낮습니다."]],
     [/(\d+)勝/g, ["$1W ", "$1승 "]], [/(\d+)敗/g, ["$1L ", "$1패 "]], [/(\d+)分/g, ["$1D ", "$1무 "]],
@@ -2466,7 +2466,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   const colPath = n => group.id ? `groups/${group.id}/${n}` : n;
   function showGroup() {
     $("gName").textContent = group.id ? group.name : "OPEN LOBBY";
-    $("gHint").textContent = group.id ? `コード「${group.name}」の仲間だけの戦績ボード。招待リンクで仲間を呼べます。` : "だれでも入れる共通ロビー。コードを決めて JOIN すると、仲間だけのスクワッドができます。";
+    $("gHint").textContent = group.id ? `コード「${group.name}」の仲間だけのOWログ。招待リンクで仲間を呼べます。` : "だれでも入れる共通ロビー。コードを決めて JOIN すると、仲間だけのスクワッドができます。";
     $("gLeave").hidden = !group.id;
   }
   function connect() {
