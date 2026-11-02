@@ -1,28 +1,86 @@
 rules_version = '2';
-// 見るのはだれでもOK。書き込み・削除は Google でログインした人だけ。1件の大きさを制限する
-// users/{uid} は本人だけが読み書きできる(記録に使う名前と、入ったグループ)
+// 見るのはだれでもOK(全体ランキングのため)。書くのは Google でログインした人だけ
+// - 試合(matches)と 1v1(duels)は「作った本人」だけが直す・消すことができる(owner に作った人の uid を入れる)
+//   owner が無い古い試合は、記録に入っている本人(uids)なら直せる
+// - グループの中に書けるのは、そのグループに入った人だけ(groups/{g}/members/{uid} がある人)
+// - users/{uid} は本人だけが読み書きできる(記録に使う名前と、入ったグループ)
 service cloud.firestore {
   match /databases/{database}/documents {
-    function okCol(c) { return c in ['matches', 'players', 'duels']; }
-    function okDoc() { return request.resource.data.size() <= 20; }
     function signedIn() { return request.auth != null; }
-    match /{c}/{id} {
-      allow read: if okCol(c);
-      allow delete: if okCol(c) && signedIn();
-      allow create, update: if okCol(c) && signedIn() && okDoc();
+    function uid() { return request.auth.uid; }
+    function okDoc() { return request.resource.data.size() <= 20; }
+    function isMember(g) { return signedIn() && exists(/databases/$(database)/documents/groups/$(g)/members/$(uid())); }
+
+    // 試合・1v1 の持ち主のチェック
+    function oldOwner() { return resource.data.get('owner', null); }
+    function isOwner() {
+      return signedIn() && (oldOwner() == uid()
+        || (oldOwner() == null && resource.data.get('uids', []).hasAny([uid()])));
     }
-    match /groups/{g}/{c}/{id} {
-      allow read: if okCol(c);
-      allow delete: if okCol(c) && signedIn();
-      allow create, update: if okCol(c) && signedIn() && okDoc();
+    // 作るとき: owner は自分
+    function okCreate() { return signedIn() && okDoc() && request.resource.data.get('owner', null) == uid(); }
+    // 直すとき: 持ち主だけ。owner は変えられない(古い記録は自分を owner にする)
+    function okUpdate() {
+      return isOwner() && okDoc()
+        && request.resource.data.get('owner', null) == (oldOwner() == null ? uid() : oldOwner());
     }
+
+    // ---- 共通ロビー(グループに入っていないとき)
+    match /matches/{id} {
+      allow read: if true;
+      allow create: if okCreate();
+      allow update: if okUpdate();
+      allow delete: if isOwner();
+    }
+    match /duels/{id} {
+      allow read: if true;
+      allow create: if okCreate();
+      allow update: if okUpdate();
+      allow delete: if isOwner();
+    }
+    // ランクは試合の記録で友達の分も動くので、ログインした人なら書ける
+    match /players/{id} {
+      allow read: if true;
+      allow create, update: if signedIn() && okDoc();
+      allow delete: if signedIn();
+    }
+
+    // ---- グループ(合言葉ごと)
+    match /groups/{g} {
+      // 入った人の名簿。自分の分だけ作る・消すことができる
+      match /members/{m} {
+        allow read: if signedIn() && m == uid();
+        allow create, update: if signedIn() && m == uid() && request.resource.data.size() <= 3;
+        allow delete: if signedIn() && m == uid();
+      }
+      match /matches/{id} {
+        allow read: if true;
+        allow create: if isMember(g) && okCreate();
+        allow update: if isMember(g) && okUpdate();
+        allow delete: if isMember(g) && isOwner();
+      }
+      match /duels/{id} {
+        allow read: if true;
+        allow create: if isMember(g) && okCreate();
+        allow update: if isMember(g) && okUpdate();
+        allow delete: if isMember(g) && isOwner();
+      }
+      // ランクは友達の分も動くので、グループに入った人なら書ける
+      match /players/{id} {
+        allow read: if true;
+        allow create, update: if isMember(g) && okDoc();
+        allow delete: if isMember(g);
+      }
+    }
+
     // 全体ランキング用(全グループの試合をまとめて読む)
     match /{path=**}/matches/{id} {
       allow read: if true;
     }
-    match /users/{uid} {
-      allow read, delete: if signedIn() && request.auth.uid == uid;
-      allow create, update: if signedIn() && request.auth.uid == uid && request.resource.data.size() <= 5;
+
+    match /users/{u} {
+      allow read, delete: if signedIn() && uid() == u;
+      allow create, update: if signedIn() && uid() == u && request.resource.data.size() <= 5;
     }
   }
 }
