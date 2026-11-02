@@ -1170,6 +1170,16 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
   // ---- 状態
   let db = null, col = null, pcol = null, canWrite = true;
   let auth = null, authUser = null, me = null, nameEditing = false;
+  // 試合・1v1 を直す・消すのは作った本人だけ(firestore.rules と同じ考え)。claude.ai の中(auth なし)では今までどおり
+  function mine(r) { return !auth || !!(authUser && r && (r.owner ? r.owner === authUser.uid : Array.isArray(r.uids) && r.uids.includes(authUser.uid))); }
+  // グループに書く前に、自分をそのグループの名簿(groups/{id}/members/{uid})に入れる
+  let memberOk = "";
+  async function ensureMember() {
+    if (!db || !auth || !authUser || !group.id) return;
+    const key = group.id + "/" + authUser.uid; if (memberOk === key) return;
+    await db.collection(`groups/${group.id}/members`).doc(authUser.uid).set({ joinedAt: Date.now() });
+    memberOk = key;
+  }
   let matches = [], players = {}, playersReady = false;
   let isSample = true, shown = 15, editing = null, pendingDel = null, pendingPDel = null, editingMatch = null;
   const form = { result: null, queue: "ランク", members: [], enemies: [], allies: [] };
@@ -1255,7 +1265,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       const m = form.members[+qs.dataset.qsave], box = qs.closest(".mem"); if (!m || !m.role || !pcol) return;
       const p = players[m.name] || { ranks: {}, platform: "" };
       const ranks = { ...p.ranks, [m.role]: { tier: +box.querySelector(".qt").value, div: +box.querySelector(".qd").value, pct: 0 } };
-      try { await pcol.doc(pid(m.name)).set({ name: m.name, ranks, platform: p.platform || "", updatedAt: Date.now() }); players[m.name] = { name: m.name, ranks, platform: p.platform || "" }; renderMembers(); }
+      try { await ensureMember(); await pcol.doc(pid(m.name)).set({ name: m.name, ranks, platform: p.platform || "", updatedAt: Date.now() }); players[m.name] = { name: m.name, ranks, platform: p.platform || "" }; renderMembers(); }
       catch (err) { $("toast").textContent = "ランクを保存できませんでした"; }
       return;
     }
@@ -1290,7 +1300,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       if (!validRank(r)) continue;
       const next = fromTotal(rankTotal(r) + sign * x.delta);
       const ranks = { ...p.ranks, [x.role]: next };
-      await pcol.doc(pid(x.name)).set({ name: x.name, ranks, platform: p.platform || "", updatedAt: Date.now() });
+      await ensureMember(); await pcol.doc(pid(x.name)).set({ name: x.name, ranks, platform: p.platform || "", updatedAt: Date.now() });
       if (next.tier !== r.tier || next.div !== r.div) notes.push(`${x.name}の${ROLE_JA[x.role]}が${rankLabel(next)}に`);
     }
     return notes;
@@ -1408,6 +1418,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       enemies: form.enemies.slice(0, 6),
       allies: form.allies.slice(0, allyMax()),
       ...(authUser && myName() ? { uids: [authUser.uid] } : {}),
+      ...(auth && authUser ? { owner: authUser.uid } : {}),
       note: $("note").value.trim().slice(0, 80), createdAt: Date.now(), by: myName() || "",
     };
     if (doc.uids) doc.members = doc.members.map(x => x.name === myName() ? { ...x, uid: authUser.uid } : x);
@@ -1418,9 +1429,11 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       doc.members = doc.members.map(keepUid);
       doc.uids = [...new Set([...(old.uids || []), ...(doc.uids || [])])];
       Object.assign(doc, { date: old.date, createdAt: old.createdAt || Date.now(), by: old.by || "", editedBy: myName() || "", editedAt: Date.now() });
+      if (old.owner) doc.owner = old.owner;
     }
     $("submit").disabled = true;
     try {
+      await ensureMember();
       if (old) await col.doc(old.id).set(doc); else await col.add(doc);
       gMatches = null;
       let notes = [];
@@ -1740,7 +1753,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       pendingPDel = null;
       const played = matches.some(m => (m.members || []).some(x => x && x.name === name));
       try {
-        await pcol.doc(pid(name)).delete();
+        await ensureMember(); await pcol.doc(pid(name)).delete();
         delete players[name];
         form.members = form.members.filter(m => m.name !== name); renderMembers();
         $("toast").textContent = played ? `${name}のランクを消しました。試合の記録に名前が残っているので、消すには履歴からその試合を消してください` : `${name}を消しました`;
@@ -1758,7 +1771,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         ranks[row.dataset.role] = { tier: +tv, div: +row.querySelector(".ed").value, pct: Math.min(99, parseInt(row.querySelector(".ep").value, 10) || 0) };
       });
       const platform = box.querySelector(".eplat").value;
-      try { await pcol.doc(pid(name)).set({ name, ranks, platform, updatedAt: Date.now() }); editing = null; $("toast").textContent = `${name}のランクを保存しました`; }
+      try { await ensureMember(); await pcol.doc(pid(name)).set({ name, ranks, platform, updatedAt: Date.now() }); editing = null; $("toast").textContent = `${name}のランクを保存しました`; }
       catch (err) { $("toast").textContent = "ランクを保存できませんでした"; }
       render();
     }
@@ -1933,7 +1946,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
           ${m.note ? `<div class="hnote">${esc(m.note)}</div>` : ""}
           ${m.by || m.editedBy ? `<div class="hby">${m.by ? `記録: <span class="nt">${esc(m.by)}</span>` : ""}${m.editedBy ? ` · 編集: <span class="nt">${esc(m.editedBy)}</span>` : ""}</div>` : ""}
         </div>
-        ${isSample || !canWrite ? "" : `<div class="hacts"><button class="del" data-edit-m="${esc(m.id)}">編集</button><button class="del${pendingDel === m.id ? " confirm" : ""}" data-del="${esc(m.id)}">${pendingDel === m.id ? "本当に消す" : "削除"}</button></div>`}
+        ${isSample || !canWrite || !mine(m) ? "" : `<div class="hacts"><button class="del" data-edit-m="${esc(m.id)}">編集</button><button class="del${pendingDel === m.id ? " confirm" : ""}" data-del="${esc(m.id)}">${pendingDel === m.id ? "本当に消す" : "削除"}</button></div>`}
       </article>`).join("") : `<div class="empty">記録がありません</div>`;
     $("more").hidden = rows.length <= shown;
   }
@@ -1967,6 +1980,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     pendingDel = null;
     const m = matches.find(x => x.id === id);
     try {
+      await ensureMember();
       await col.doc(id).delete();
       try { if (m) await applyRankChanges(m.members || [], -1); } catch (err) {}
       $("toast").textContent = "1試合を削除しました(ランク変動も元に戻しました)";
@@ -2164,9 +2178,10 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     if (!dcol || !a || !b) return;
     if (a === b) { $("dToast").textContent = "同じ名前どうしは記録できません"; return; }
     const myst = dform.rule === "mystery" || dform.rule === "arena";
-    const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: snap3(dform.s[0]), s2: snap3(dform.s[1]), map: dform.map, date: today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now() };
+    const doc = { rule: dform.rule, p1: { name: a, hero: myst ? "" : dform.p[0].hero }, p2: { name: b, hero: myst ? "" : dform.p[1].hero }, s1: snap3(dform.s[0]), s2: snap3(dform.s[1]), map: dform.map, date: today(), note: $("dNote").value.trim().slice(0, 80), createdAt: Date.now(), ...(auth && authUser ? { owner: authUser.uid } : {}) };
     $("dSubmit").disabled = true;
     try {
+      await ensureMember();
       await dcol.add(doc);
       lsSet("ow-duel-last", JSON.stringify([doc.p1, doc.p2]));
       $("dToast").textContent = `1v1を記録しました: ${a} ${doc.s1}-${doc.s2} ${b}`;
@@ -2273,7 +2288,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         <td>${who(d.p2)}</td>
         <td>${esc(d.map)}<span class="who label">${RULES[ruleOf(d)]}</span></td>
         <td>${esc(d.note)}</td>
-        <td>${dIsSample || !canWrite ? "" : `<button class="del${dPendingDel === d.id ? " confirm" : ""}" data-ddel="${esc(d.id)}">${dPendingDel === d.id ? "本当に消す" : "削除"}</button>`}</td>
+        <td>${dIsSample || !canWrite || !mine(d) ? "" : `<button class="del${dPendingDel === d.id ? " confirm" : ""}" data-ddel="${esc(d.id)}">${dPendingDel === d.id ? "本当に消す" : "削除"}</button>`}</td>
       </tr>`).join("") : `<tr><td colspan="7" class="empty">記録がありません</td></tr>`;
     $("dMore").hidden = rows.length <= dShown;
   }
@@ -2283,7 +2298,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
     const id = b.dataset.ddel;
     if (dPendingDel !== id) { dPendingDel = id; renderDuels(); return; }
     dPendingDel = null;
-    try { await dcol.doc(id).delete(); $("dToast").textContent = "1戦を削除しました"; }
+    try { await ensureMember(); await dcol.doc(id).delete(); $("dToast").textContent = "1戦を削除しました"; }
     catch (err) { $("dToast").textContent = "削除できませんでした"; renderDuels(); }
   });
   setMode(lsGet("ow-mode") || "team");
@@ -2669,6 +2684,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       setStatus(); updateDSubmit(); renderDuels();
     }, fail));
     setStatus(); updateSubmit(); updateDSubmit();
+    ensureMember().catch(() => {});
   }
   function joinGroup(name) {
     name = String(name || "").trim().slice(0, 24);
@@ -2759,7 +2775,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
       if (!Object.keys(ranks).length) { $("aForm").querySelector(".rst").focus(); return; }
       const p = players[me.name] || { ranks: {}, platform: "" };
       const all = { ...p.ranks, ...ranks };
-      try { await pcol.doc(pid(me.name)).set({ name: me.name, ranks: all, platform: p.platform || "", updatedAt: Date.now() }); players[me.name] = { name: me.name, ranks: all, platform: p.platform || "" }; $("toast").textContent = "ランクを保存しました"; renderMembers(); renderAcct(); }
+      try { await ensureMember(); await pcol.doc(pid(me.name)).set({ name: me.name, ranks: all, platform: p.platform || "", updatedAt: Date.now() }); players[me.name] = { name: me.name, ranks: all, platform: p.platform || "" }; $("toast").textContent = "ランクを保存しました"; renderMembers(); renderAcct(); }
       catch (err) { $("toast").textContent = "ランクを保存できませんでした"; }
     }
     else if (id === "aSave") {
@@ -2803,6 +2819,7 @@ th { text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
         if (me && group.name && !me.groups.includes(group.name)) { me.groups = [group.name, ...me.groups].slice(0, 12); saveMe(); }
         if (me && !group.name && me.groups.length && !lsGet("ow-group-chosen")) joinGroup(me.groups[0]);
         useMyName();
+        ensureMember().catch(() => {});
       }
       canWrite = !!(u && me && me.name);
       renderAcct(); setStatus(); updateSubmit(); updateDSubmit();
